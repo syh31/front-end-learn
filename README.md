@@ -55,6 +55,11 @@ P1~P44是基础部分
 视频地址：https://www.bilibili.com/video/BV1wr4y1K7tq?spm_id_from=333.999.0.0  
 先看P1~P11基础部分
 
+### 5. Vuex
+vue视频地址：https://www.bilibili.com/video/BV1Wp411d7Ur  
+P63~P75  
+官方文档：https://v3.vuex.vuejs.org/zh/
+
 ## 其它资料
 1. vue-element-admin https://panjiachen.gitee.io/vue-element-admin-site/zh/
 2. 若依框架 https://doc.ruoyi.vip/
