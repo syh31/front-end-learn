@@ -13,7 +13,7 @@
 
 ### 3. JavaScript基础
 《JavaScript高级程序设计》（第4版）  
-基础阶段主要学习第三章，电子版可以找我拷  
+基础阶段主要学习第三章
 MDN文档：https://developer.mozilla.org/zh-CN/  
 要能熟练运用MDN查东西
 
