@@ -1,0 +1,2573 @@
+<html><head><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/vditor@3.6.0/dist/index.css"/>
+<script src="https://cdn.jsdelivr.net/npm/vditor@3.6.0/dist/method.min.js"></script></head>
+<body><div class="vditor-reset" id="preview"><h3 id="React面试题及答案系列">React面试题及答案系列</h3>
+<h4 id="1--中--的作用是什么-">1.<code>React</code> 中 <code>keys</code> 的作用是什么？</h4>
+<blockquote>
+<p>Keys 是 React 用于追踪哪些列表中元素被修改、被添加或者被移除的辅助标识。</p>
+</blockquote>
+<pre><code class="language-js">render () {
+  return (
+   ‹ul›
+     {
+      this.state.list.map(({item, key}) =› {
+        return ‹li key={key}›{item}‹/li›
+      })
+     }
+    ‹/ul›
+  )
+}
+</code></pre>
+<p>在开发过程中，我们需要保证某个元素的 key 在其同级元素中具有唯一性。在 <code>React Diff</code> 算法中 <code>React</code> 会借助元素的 <code>Key</code> 值来判断该元素是新近创建的还是被移动而来的元素，从而减少不必要的元素重渲染。此外，<code>React</code> 还需要借助 <code>Key</code> 值来判断元素与本地状态的关联关系，因此我们绝不可忽视转换函数中 <code>Key</code> 的重要性。</p>
+<h4 id="2-当你调用--的时候-发生了什么事-">2.当你调用 <code>setState</code> 的时候，发生了什么事？</h4>
+<p>将传递给 <code>setState</code> 的对象合并到组件的当前状态，这将启动一个和解的过程，构建一个新的 <code>react</code> 元素树，与上一个元素树进行对比（ <code>diff</code> ），从而进行最小化的重渲染。</p>
+<h4 id="3-为什么-的参数是一个--而不是一个对">3.为什么<code>setState</code> 的参数是一个 <code>callback</code> 而不是一个对</h4>
+<p>因为 <code>this.props</code> 和 <code>this.state</code> 的更新可能是异步的，不能依赖它们的值去计算下一个 <code>state</code>。</p>
+<h4 id="4-状态--和属性--之间有何区别">4.状态(<code>state</code>)和属性(<code>props</code>)之间有何区别</h4>
+<p><code>State</code> 是一种数据结构，用于组件挂载时所需数据的默认值。</p>
+<p><code>State</code> 可能会随着时间的推移而发生突变，但多数时候是作为用户事件行为的结果。</p>
+<p><code>Props</code>(properties 的简写)则是组件的配置。<code>props</code> 由父组件传递给子组件，并且就子组件而言，<code>props</code> 是不可变的(immutable)。</p>
+<p>组件不能改变自身的 <code>props</code>，但是可以把其子组件的 props 放在一起(统一管理)。<code>Props</code> 也不仅仅是数据--回调函数也可以通过 props 传递。</p>
+<h4 id="5-应该在--组件的何处发起--请求-">5.应该在 <code>React</code> 组件的何处发起 <code>Ajax</code> 请求?</h4>
+<p>在 <code>React</code> 组件中，应该在 <code>componentDidMount</code> 中发起网络请求。这个方法会在组件第一次“挂载”(被添加到 <code>DOM</code>)时执行，在组件的生命周期中仅会执行一次。</p>
+<p>更重要的是，你不能保证在组件挂载之前 <code>Ajax</code> 请求已经完成，如果是这样，也就意味着你将尝试在一个未挂载的组件上调用 <code>setState</code>，这将不起作用。 在 <code>componentDidMount</code> 中发起网络请求将保证这有一个组件可以更新了。</p>
+<h4 id="6--中的三种构建组件的方式-">6.<code>React</code> 中的三种构建组件的方式？</h4>
+<p><code>React.createClass()</code>、<code>ES6 class</code> 和无状态函数。</p>
+<h4 id="7--中--的作用是什么-">7.<code>React</code> 中 <code>refs</code> 的作用是什么？</h4>
+<p><code>Refs 是&lt;span&gt; &lt;/span&gt;</code>React<code>提供给我们的安全访问</code>DOM` 元素或者某个组件实例的句柄。</p>
+<p>我们可以为元素添加 ref 属性然后在回调函数中接受该元素在 DOM 树中的句柄，该值会作为回调函数的第一个参数返回：</p>
+<pre><code class="language-js">class CustomForm extends Component {
+  handleSubmit = () =› {
+    console.log('Input Value: ', this.input.value);
+  };
+  render() {
+    return (
+      ‹form onSubmit={this.handleSubmit}›
+        ‹input type='text' ref={input =› (this.input = input)} /›
+        ‹button type='submit'›Submit‹/button›
+      ‹/form›
+    );
+  }
+}
+</code></pre>
+<p>上述代码中的 <code>input</code> 域包含了一个 <code>ref</code> 属性，该属性声明的回调函数会接收 <code>input</code> 对应的 <code>DOM</code> 元素，我们将其绑定到 this指针以便在其他的类函数中使用。</p>
+<p>另外值得一提的是，<code>refs</code> 并不是类组件的专属，函数式组件同样能够利用闭包暂存其值：</p>
+<pre><code class="language-js">function CustomForm({ handleSubmit }) {
+  let inputElement;
+  return (
+    ‹form onSubmit={() =› handleSubmit(inputElement.value)}›
+      ‹input type='text' ref={input =› (inputElement = input)} /›
+      ‹button type='submit'›Submit‹/button›
+    ‹/form›
+  );
+}
+</code></pre>
+<h5 id="8-请描述下-原理-常考-大厂必考--">8.请描述下<code>react diff</code> 原理（常考，大厂必考）?</h5>
+<p>把树形结构按照层级分解，只比较同级元素。</p>
+<p>给列表结构的每个单元添加唯一的 <code>key</code> 属性，方便比较。</p>
+<p><code>React</code> 只会匹配相同 <code>class</code> 的 component（这里面的 <code>class</code> 指的是组件的名字） 合并操作，调用 <code>component</code> 的 <code>setState</code> 方法的时候, <code>React</code> 将其标记为 <code>dirty</code>. 到每一个事件循环结束, <code>React</code> 检查所有标记 <code>dirty</code> 的 <code>component</code> 重新绘制. 选择性子树渲染。开发人员可以重写 <code>shouldComponentUpdate</code> 提高 <code>diff</code> 的性能。</p>
+<h4 id="9-说说-优势-">9.说说<code>React</code> 优势?</h4>
+<ol>
+<li><code>React</code> 速度很快：它并不直接对 <code>DOM</code> 进行操作，引入了一个叫做虚拟 <code>DOM</code> 的概念，安插在 <code>javascript</code> 逻辑和实际的 <code>DOM</code> 之间，性能好。</li>
+<li>跨浏览器兼容：虚拟 <code>DOM</code> 帮助我们解决了跨浏览器问题，它为我们提供了标准化的 <code>API</code>，甚至在 <code>IE8</code> 中都是没问题的。</li>
+<li>一切都是 <code>component</code>：代码更加模块化，重用代码更容易，可维护性高。</li>
+<li>单向数据流：<code>Flux</code> 是一个用于在 <code>JavaScript</code> 应用中创建单向数据层的架构，它随着 <code>React</code> 视图库的开发而被 Facebook 概念化。</li>
+<li>同构、纯粹的 <code>javascript</code>：因为搜索引擎的爬虫程序依赖的是服务端响应而不是 <code>JavaScript</code> 的执行，预渲染你的应用有助于搜索引擎优化。</li>
+<li>兼容性好：比如使用 <code>RequireJS</code> 来加载和打包，而 <code>Browserify</code> 和 <code>Webpack</code> 适用于构建大型应用。它们使得那些艰难的任务不再让人望而生畏。</li>
+</ol>
+<h4 id="10-说说--生命周期函数-">10.说说 <code>react</code> 生命周期函数?</h4>
+<h5 id="初始化阶段-">初始化阶段：</h5>
+<p><code>getDefaultProps</code>:获取实例的默认属性</p>
+<p><code>getInitialState</code>:获取每个实例的初始化状态</p>
+<p><code>componentWillMount</code>：组件即将被装载、渲染到页面上</p>
+<p><code>render</code>:组件在这里生成虚拟的 <code>DOM</code> 节点</p>
+<p><code>componentDidMount</code>:组件真正在被装载之后 运行中状态：</p>
+<p><code>componentWillReceiveProps</code>:组件将要接收到属性的时候调用</p>
+<p><code>shouldComponentUpdate</code>:组件接受到新属性或者新状态的时候（可以返回 <code>false</code>，接收数据后不更新，阻止 <code>render</code> 调用，后面的函数不会被继续执行了） <code>componentWillUpdate</code>:组件即将更新不能修改属性和状态</p>
+<p><code>render</code>:组件重新描绘</p>
+<p><code>componentDidUpdate</code>:组件已经更新</p>
+<p>销毁阶段：</p>
+<p><code>componentWillUnmount</code>:组件即将销毁</p>
+<h4 id="11-组件中怎么做事件代理理">11.<code>React</code>组件中怎么做事件代理理</h4>
+<p>虽然很多资料都说 <code>React</code> 的事件是会被代理到 <code>document</code> 上，但是我翻遍了官网，也没有找到相应的说明。</p>
+<p>那么，有什么办法能够证明它吗？我想到了一个方法 → 通过 <code>Chrome</code> 浏览器的 <code>Event Listeners</code> 面板查看元素的绑定事件，具体的使用方法请参考官网文档。</p>
+<p><a href="https://user-images.githubusercontent.com/8401872/28256965-ac991142-6af9-11e7-844a-c6d72dc74666.png"><img src="https://user-images.githubusercontent.com/8401872/28256965-ac991142-6af9-11e7-844a-c6d72dc74666.png" alt="" /></a></p>
+<p>从图中我们可以看到：</p>
+<p>1.<code>#child</code> 元素绑定了两个点击事件，一个是通过 <code>React</code> 绑定的，一个是通过 <code>addEventListener</code> 绑定的。 2.通过 <code>addEventListener</code> 绑定的事件是真的绑定到 <code>#child</code> 元素上。 3.通过 <code>React</code> 绑定的事件，其实是代理绑定到 <code>document</code> 上。</p>
+<h5 id="React-模拟-DOM-事件冒泡机制">React 模拟 DOM 事件冒泡机制</h5>
+<p>观察下面这个例子：<code>#child</code> 和 <code>#parent</code> 都绑定了一个点击事件。</p>
+<p><a href="https://github.com/yangyunhai/FrontendPeople/blob/master/questions/ReactJS.md"><img src="" alt="" /></a></p>
+<p>由图中可以看出：点击 <code>#child</code> 的同时，也触发了 <code>#parent</code> 的点击事件，看起来“很像” DOM 的事件冒泡机制。然而，实际原理并非如此，因为按照 <code>React</code> 的事件代理，<code>#child</code> 和 <code>#parent</code> 绑定的事件本来就是代理到 <code>document</code> 上的。也就是说，只有当事件流冒泡到 <code>document</code> 上时，才会依次触发 <code>document</code> 上绑定的两个事件。</p>
+<p>到此为止，我以为我终于搞明白这块了，后来我发现我还是错了。如果说 <code>#child</code> 和 <code>#parent</code> 的事件都代理到 <code>document</code> 上的话，那么在 <code>Event Listeners</code> 面板中，我们应该能看到 2 个绑定在 <code>document</code> 上的事件，但实际上只有 1 个，如下图所示。</p>
+<p><a href="https://github.com/yangyunhai/FrontendPeople/blob/master/questions/ReactJS.md"><img src="" alt="" /></a></p>
+<p>因此，我们可以得出结论：并非 <code>#child</code> 和 <code>#parent</code> 的事件分别代理到 <code>document</code> 上，而是 <code>React</code> 在 <code>document</code> 上绑定了一个 <code>dispatchEvent</code> 函数（事件），在执行 <code>dispatchEvent</code> 的过程中，其内部会依次执行 <code>#child</code> 和 <code>#parent</code> 上绑定的事件。请注意，虽然 <code>dispatchEvent</code> 和代理到 <code>document</code> 上这两种方式的表现结果一样，但是其本质是有很大差别的，后边我们结合到 <code>stopImmediatePropagation</code> 的时候便会讲到。</p>
+<p>那么这个 <code>dispatchEvent</code> 函数又是如何做到依次触发 <code>#child</code> 和 <code>#parent</code> 的事件的呢？我无力研究 <code>React</code> 这部分的源码，只好自己猜想了一下，其伪代码可能是这样子：</p>
+<pre><code class="language-js">function dispatchEvent(event) {
+     let target = event.target;
+     target.click &amp;&amp; target.click();  // 触发点击元素的事件
+     while (target.parentNode) {      // 沿 DOM 向上回溯，遍历父节点，触发其 click 事件
+         target.parentNode.click &amp;&amp; target.parentNode.click();
+         target = target.parentNode;
+     }
+ }
+</code></pre>
+<p>这应该便是 <code>React</code> 模拟 <code>DOM</code> 事件冒泡的大致原理。</p>
+<h5 id="React-禁止事件冒泡">React 禁止事件冒泡</h5>
+<p>既然有“事件冒泡”，就得有相应的禁止它的方法，这一点 <code>React</code> 的官网中便有提到：通过 <code>React</code> 绑定的事件，其回调函数中的 <code>event</code> 对象，是经过 <code>React</code> 合成的 <code>SyntheticEvent</code>，与原生的 DOM 事件的 event 不是一回事。准确地说，在 <code>React</code> 中，<code>e.nativeEvent</code> 才是原生 DOM 事件的那个 <code>event</code>，虽然 <code>React</code> 的合成事件对象也同样实现了 <code>stopPropagation</code> 接口。</p>
+<p>因此，在 <code>React</code> 中，想要阻止“事件冒泡”（再强调一次，<code>React</code> 只是模拟事件冒泡，并非真正的 <code>DOM</code> 事件冒泡），只需要在回调函数中调用 <code>e.stopPropagation</code>。请注意，这时候的 <code>e.stopPropagation</code>非原生事件对象的 <code>stopPropagation</code>。</p>
+<p>以上这些都是官网中已经有的，那本文又有什么新意呢？请看下面的例子：<code>#child</code>、<code>#parent</code> 和 <code>document</code> 上都绑定了事件，如何做到只触发 <code>#child</code> 上的事件？</p>
+<p><a href="https://github.com/yangyunhai/FrontendPeople/blob/master/questions/ReactJS.md"><img src="" alt="" /></a></p>
+<h5 id="我们来尝试解释一下上图中的现象-">我们来尝试解释一下上图中的现象：</h5>
+<p>事件流首先进入到 <code>#child</code> ，然后触发直接绑定在 <code>#child</code> 上的事件；</p>
+<p>事件流沿着 DOM 结构向上冒泡到 <code>document</code>，触发 <code>React</code> 绑定的 <code>dispatchEvent</code> 函数，从而调用了 <code>#child</code> 子元素上绑定的 <code>clickChild</code> 方法。</p>
+<p>在 <code>clickChild</code> 方法的最后，我调用了 <code>e.stopPropagation</code>，成功地阻止了 <code>React</code> 模拟的事件冒泡，因此，成功地没有触发 <code>#parent</code> 上的事件。</p>
+<p>然后，最后出现了问题，还是触发了 document 上直接绑定的事件。我想要的是：”点击 <code>#child</code> ，只触发 <code>#child</code> 上的事件，不要触发任何其他元素的事件，包括 <code>document</code>，我应该怎么做呢？ → 答案是：调用<code>e.nativeEvent.stopImmediatePropagation</code> 上述过程用图解的方式来分析，我们能理解得清楚一些。</p>
+<p><a href="https://github.com/yangyunhai/FrontendPeople/blob/master/questions/ReactJS.md"><img src="" alt="" /></a></p>
+<p><code>React</code> 合成事件对象的<code>e.stopPropagation</code>，只能阻止 <code>React</code> 模拟的事件冒泡，并不能阻止真实的 <code>DOM</code> 事件冒泡，更加不能阻止已经触发元素的多个事件的依次执行。在这种情况下，只有原生事件对象的 <code>stopImmediatePropagation</code>能做到。</p>
+<p>你可能会说：”既然 <code>React</code> 在合成事件对象中封装了 <code>stopPropagation</code>，为什么不把 <code>stopImmediatePropagation</code> 也一并封装了呢？“</p>
+<p>我的猜测是：”因为在 <code>React</code> 中不允许给同一个组件绑定多个相同类型的事件，如果非要重复绑定，那么后绑定的会覆盖前绑定的，这是它的设计思路。在这种设计思路下，不会存在某个组件有多个同类型的事件会依次触发，自然便不需要 <code>stopImmediatePropagation</code> 了。</p>
+<h5 id="总结">总结</h5>
+<p>对于 <code>React</code> 的合成事件对象 <code>e</code> 来说：</p>
+<p><code>e.stopPropagation</code> → 用来阻止 React 模拟的事件冒泡</p>
+<p><code>e.stopImmediatePropagation</code> → 没有这个函数</p>
+<p><code>e.nativeEvent.stopPropagation</code> → 原生事件对象的用于阻止 <code>DOM</code> 事件的进一步捕获或者冒泡</p>
+<p><code>e.nativeEvent.stopImmediatePropagation</code> → 原生事件对象的用于阻止 <code>DOM</code> 事件的进一步捕获或者冒泡，且该元素的后续绑定的相同事件类型的事件也被一并阻止。</p>
+<h4 id="12--的各种情况">12.<code>this</code> 的各种情况</h4>
+<p>call apply bind指的this是谁就是谁（bind不会调用，只会将当前的函数返回）</p>
+<p><code>fun.call(obj,a,b)</code></p>
+<p><code>fun.apply(obj,[  ])</code></p>
+<p><code>fun.bind(obj,a,b)()</code></p>
+<h5 id="this的情况-">this的情况：</h5>
+<p>1.以函数形式调用时，<code>this</code>永远都是window</p>
+<p>2.以方法的形式调用时，<code>this</code>是调用方法的对象</p>
+<p>3.以构造函数的形式调用时，<code>this</code>是新创建的那个对象</p>
+<p>4.使用<code>call</code>和<code>apply</code>调用时，<code>this</code>是指定的那个对象</p>
+<p>5.箭头函数：箭头函数的<code>this</code>看外层是否有函数</p>
+<ol>
+<li>如果有，外层函数的<code>this</code>就是内部箭头函数的<code>this</code> 2）如果没有，就是<code>window</code></li>
+</ol>
+<p>6.特殊情况：通常意义上<code>this</code>指针指向为最后调用它的对象。这里需要注意的一点就是如果返回值是一个对象，那么<code>this</code>指向的就是那个返回的对象，如果返回值不是一个对象那么<code>this</code>还是指向函数的实例</p>
+<h4 id="13-介绍-异常捕获-如何进行异常处理-">13.介绍<code>Promise</code>，异常捕获,如何进行异常处理?</h4>
+<p><code>Promise</code>是解决回调地狱的好工具，比起直接使用回调函数<code>promise</code>的语法结构更加清晰，代码的可读性大大增加。</p>
+<p>但是想要在真是的项目中恰当的运用<code>promise</code>可不是随便写个Demo这个简单的，如果运用不当反而会增加代码的复杂性。</p>
+<p>使用<code>Promise</code>经常遇到的问题</p>
+<h6 id="老旧浏览器没有Promise全局对象增么办-">老旧浏览器没有Promise全局对象增么办?</h6>
+<p>可以使用<code>es6-promise-polyfill</code>。<code>es6-promise-polyfill</code>可以使用页面标签直接引入，当然也可以通过<code>es6</code>的<code>import</code>方法引入。</p>
+<p>引入这个<code>polyfill</code>之后，它会在<code>window</code>对象中加入<code>Promise</code>对象。这样我们就可以全局使用<code>Promise</code>了。</p>
+<h6 id="如何进行异常处理-">如何进行异常处理？</h6>
+<p>参照<code>promise</code>的文档我们可以在<code>reject</code>回调和<code>catch</code>中处理异常。但是<code>promise</code>规定如果一个错误在<code>reject</code>函数中被处理，那么<code>promise</code>将从异常常态中恢复过来。这意味着接下来的<code>the</code>n方法将接收到一个<code>resolve</code>回调。</p>
+<p>大多数时候我们希望发生错误的时候，<code>promise</code>处理当前的异常并中断后续的<code>then</code>操作。 我们先来看一个使用<code>reject</code>处理异常的例子</p>
+<pre><code class="language-js">var promiseStart = new Promise(function(resolve, reject){
+    reject('promise is rejected');
+});
+
+promiseStart.then(function(response) {
+    console.log('resolved');
+    return new Promise(function(resolve, reject){
+        resolve('promise is resolved');
+    });
+})
+.then(function (response){
+    console.log('resolved:', response);
+})
+.catch(function(error) {
+    console.log('catched:', error);
+})
+</code></pre>
+<pre><code class="language-js">输出：
+catched: promise is rejected
+</code></pre>
+<h4 id="14-怎么做数据的检查和变化">14.<code>React</code>怎么做数据的检查和变化</h4>
+<p><code>props</code>:组件属性，专门用来连接父子组件间通信，父组件传输父类成员，子组件可以利用但不能编辑父类成员；</p>
+<p><code>state</code>：专门负责保存和改变组件内部的状态；</p>
+<h5 id="数据传递">数据传递</h5>
+<p>在<code>React</code>中,父组件给子组件传递数据时,通过给子组件设置<code>props</code>的方式,子组件取得<code>props</code>中的值,即可完成数据传递.被传递数据的格式可以是任何<code>js</code>可识别的数据结构</p>
+<p><code>props</code>一般只作为父组件给子组件传递数据用,不要试图去修改自己的<code>props</code></p>
+<h5 id="数据改变">数据改变</h5>
+<p><code>props</code>不能被自身修改,如果组建内部的属性发生变化使用<code>state</code></p>
+<pre><code class="language-js">this.setState({ 
+    ... 
+})
+</code></pre>
+<p><code>React</code>会实时监听每个组件的<code>props</code>和<code>state</code>的值,一旦有变化,会立刻更新组件,将结果重新渲染到页面上,<code>state</code>，<code>props</code></p>
+<h4 id="15-介绍常见的优化方式">15.介绍常见的<code>react</code>优化方式</h4>
+<p><code>React</code> 渲染性能优化的三个方向，其实也适用于其他软件开发领域，这三个方向分别是:</p>
+<p>1.减少计算的量。 -&gt; 对应到 <code>React</code> 中就是减少渲染的节点 或者 降低组件渲染的复杂度</p>
+<p>2.利用缓存。-&gt; 对应到 <code>React</code> 中就是如何避免重新渲染，利用函数式编程的 <code>memo</code> 方式来避免组件重新渲染</p>
+<p>3.精确重新计算的范围。 对应到 React 中就是绑定组件和状态关系, 精确判断更新的'时机'和'范围'. 只重新渲染'脏'的组件，或者说降低渲染范围</p>
+<h5 id="目录">目录</h5>
+<h5 id="减少渲染的节点-降低渲染计算量-复杂度-">减少渲染的节点/降低渲染计算量(复杂度)</h5>
+<p>0️⃣ 不要在渲染函数都进行不必要的计算</p>
+<p>1️⃣ 减少不必要的嵌套</p>
+<p>2️⃣ 虚拟列表</p>
+<p>3️⃣ 惰性渲染</p>
+<p>4️⃣ 选择合适的样式方案</p>
+<h5 id="避免重新渲染">避免重新渲染</h5>
+<p>0️⃣ 简化 props</p>
+<p>1️⃣ 不变的事件处理器</p>
+<p>2️⃣ 不可变数据</p>
+<p>3️⃣ 简化 state</p>
+<p>4️⃣ 使用 recompose 精细化比对</p>
+<h5 id="精细化渲染">精细化渲染</h5>
+<p>0️⃣ 响应式数据的精细化渲染</p>
+<p>1️⃣ 不要滥用 Context</p>
+<h5 id="扩展">扩展</h5>
+<p>减少渲染的节点/降低渲染计算量(复杂度) 首先从计算的量上下功夫，减少节点渲染的数量或者降低渲染的计算量可以显著的提高组件渲染性能。</p>
+<p>0️⃣ 不要在渲染函数都进行不必要的计算</p>
+<p>比如不要在渲染函数(render)中进行数组排序、数据转换、订阅事件、创建事件处理器等等. 渲染函数中不应该放置太多副作用</p>
+<p>1️⃣ 减少不必要的嵌套</p>
+<p>所以我们需要理性地选择一些工具，比如使用原生的 CSS，减少 React 运行时的负担.</p>
+<p>一般不必要的节点嵌套都是滥用高阶组件/RenderProps 导致的。所以还是那句话‘只有在必要时才使用 xxx’。 有很多种方式来代替高阶组件/RenderProps，例如优先使用 props、React Hooks</p>
+<p>2️⃣ 虚拟列表</p>
+<p>虚拟列表是常见的‘长列表'和'复杂组件树'优化方式，它优化的本质就是减少渲染的节点。</p>
+<p>虚拟列表常用于以下组件场景:</p>
+<p>无限滚动列表，grid, 表格，下拉列表，spreadsheets 无限切换的日历或轮播图 大数据量或无限嵌套的树 聊天窗，数据流(feed), 时间轴 等等</p>
+<p>3️⃣ 惰性渲染</p>
+<p>惰性渲染的初衷本质上和虚表一样，也就是说我们只在必要时才去渲染对应的节点。</p>
+<p>举个典型的例子，我们常用 Tab 组件，我们没有必要一开始就将所有 Tab 的 panel 都渲染出来，而是等到该 Tab 被激活时才去惰性渲染。</p>
+<p>还有很多场景会用到惰性渲染，例如树形选择器，模态弹窗，下拉列表，折叠组件等等。</p>
+<p>这里就不举具体的代码例子了，留给读者去思考.</p>
+<p>4️⃣ 选择合适的样式方案</p>
+<p><a href="https://camo.githubusercontent.com/dc0200263567e604c26ebe42a121214dab9e347fb46ad3404b7823edb2924dc0/68747470733a2f2f706963322e7a68696d672e636f6d2f38302f76322d31313963333336623932396435373635326430616537666362623762666137385f373230772e6a7067"><img src="https://camo.githubusercontent.com/dc0200263567e604c26ebe42a121214dab9e347fb46ad3404b7823edb2924dc0/68747470733a2f2f706963322e7a68696d672e636f6d2f38302f76322d31313963333336623932396435373635326430616537666362623762666137385f373230772e6a7067" alt="" /></a></p>
+<p>所以在样式运行时性能方面大概可以总结为：<code>CSS</code> &gt; <code>大部分CSS-in-js</code> &gt; <code>inline style</code></p>
+<p>避免重新渲染 减少不必要的重新渲染也是 <code>React</code> 组件性能优化的重要方向. 为了避免不必要的组件重新渲染需要在做到两点:</p>
+<p>保证组件纯粹性。即控制组件的副作用，如果组件有副作用则无法安全地缓存渲染结果 通过<code>shouldComponentUpdate</code>生命周期函数来比对 <code>state</code> 和 <code>props</code>, 确定是否要重新渲染。对于函数组件可以使用<code>React.memo</code>包装 另外这些措施也可以帮助你更容易地优化组件重新渲染:</p>
+<p>0️⃣ 简化 props ① 如果一个组件的 props 太复杂一般意味着这个组件已经违背了‘单一职责’，首先应该尝试对组件进行拆解. ② 另外复杂的 props 也会变得难以维护, 比如会影响shallowCompare效率, 还会让组件的变动变得难以预测和调试.</p>
+<p>下面是一个典型的例子, 为了判断列表项是否处于激活状态，这里传入了一个当前激活的 id:</p>
+<p>这是一个非常糟糕的设计，一旦激活 id 变动，所有列表项都会重新刷新. 更好的解决办法是使用类似actived这样的布尔值 prop. actived 现在只有两种变动情况，也就是说激活 id 的变动，最多只有两个组件需要重新渲染.</p>
+<p>简化的 props 更容易理解, 且可以提高组件缓存的命中率</p>
+<p>1️⃣ 不变的事件处理器 ①避免使用箭头函数形式的事件处理器, 例如:</p>
+<complexcomponent> onClick(evt.id)} otherProps={values} /&gt;
+<p>假设 <code>ComplexComponent</code> 是一个复杂的 <code>PureComponent</code>, 这里使用箭头函数，其实每次渲染时都会创建一个新的事件处理器，这会导致 <code>ComplexComponent</code> 始终会被重新渲染.</p>
+<p>更好的方式是使用实例方法:</p>
+<pre><code class="language-js">class MyComponent extends Component {
+  render() {
+    &lt;ComplexComponent onClick={this.handleClick} otherProps={values} /&gt;;
+  }
+  handleClick = () =&gt; {
+    /*...*/
+  };
+}
+</code></pre>
+<p>② 即使现在使用<code>hooks</code>，我依然会使用<code>useCallback</code>来包装事件处理器，尽量给下级组件暴露一个静态的函数:</p>
+<pre><code class="language-js">const handleClick = useCallback(() =&gt; {
+  /*...*/
+}, []);
+
+return &lt;ComplexComponent onClick={handleClick} otherProps={values} /&gt;;
+</code></pre>
+<p>但是如果<code>useCallback</code>依赖于很多状态，你的<code>useCallback</code>可能会变成这样:</p>
+<pre><code class="language-js">const handleClick = useCallback(() =&gt; {
+  /*...*/
+  //  
+}, [foo, bar, baz, bazz, bazzzz]);
+</code></pre>
+<p>这种写法实在让人难以接受，这时候谁还管什么函数式非函数式的。我是这样处理的:</p>
+<pre><code class="language-js">function useRefProps&lt;T&gt;(props: T) {
+  const ref = useRef &lt; T &gt; props;
+  // 每次渲染更新props
+  useEffect(() =&gt; {
+    ref.current = props;
+  });
+}
+
+function MyComp(props) {
+  const propsRef = useRefProps(props);
+
+  // 现在handleClick是始终不变的
+  const handleClick = useCallback(() =&gt; {
+    const { foo, bar, baz, bazz, bazzzz } = propsRef.current;
+    // do something
+  }, []);
+}
+</code></pre>
+<p>③设计更方便处理的 <code>Event Props</code>. 有时候我们会被逼的不得不使用箭头函数来作为事件处理器：</p>
+<pre><code class="language-js">&lt;List&gt;
+  {list.map(i =&gt; (
+    &lt;Item key={i.id} onClick={() =&gt; handleDelete(i.id)} value={i.value} /&gt;
+  ))}
+&lt;/List&gt;
+</code></pre>
+<p>上面的 <code>onClick</code> 是一个糟糕的实现，它没有携带任何信息来标识事件来源，所以这里只能使用闭包形式，更好的设计可能是这样的:</p>
+<pre><code class="language-js">// onClick传递事件来源信息
+const handleDelete = useCallback((id: string) =&gt; {
+  /*删除操作*/
+}, []);
+
+return (
+  &lt;List&gt;
+    {list.map(i =&gt; (
+      &lt;Item key={i.id} id={i.id} onClick={handleDelete} value={i.value} /&gt;
+    ))}
+  &lt;/List&gt;
+);
+</code></pre>
+<p>如果是第三方组件或者 <code>DOM</code> 组件呢? 实在不行，看能不能传递<code>data-*</code>属性:</p>
+<pre><code class="language-js">const handleDelete = useCallback(event =&gt; {
+  const id = event.dataset.id;
+  /*删除操作*/
+}, []);
+
+return (
+  &lt;ul&gt;
+    {list.map(i =&gt; (
+      &lt;li key={i.id} data-id={i.id} onClick={handleDelete} value={i.value} /&gt;
+    ))}
+  &lt;/ul&gt;
+);
+</code></pre>
+<p>2️⃣ 不可变数据 不可变数据可以让状态变得可预测，也让 <code>shouldComponentUpdate</code> '浅比较'变得更可靠和高效.</p>
+<p>相关的工具有<code>Immutable.js</code>、<code>Immer</code>、<code>immutability-helper</code> 以及 <code>seamless-immutable</code>。</p>
+<p>3️⃣ 简化 state</p>
+<p>不是所有状态都应该放在组件的 <code>state</code> 中. 例如缓存数据。按照我的原则是：如果需要组件响应它的变动, 或者需要渲染到视图中的数据才应该放到 <code>state</code> 中。这样可以避免不必要的数据变动导致组件重新渲染.</p>
+<p>4️⃣ 使用 recompose 精细化比对</p>
+<p>尽管 <code>hooks</code> 出来后，<code>recompose</code> 宣称不再更新了，但还是不影响我们使用 <code>recompose</code> 来控制<code>shouldComponentUpdate</code>方法, 比如它提供了以下方法来精细控制应该比较哪些 props:</p>
+<pre><code class="language-js">/* 相当于React.memo */
+ pure()
+ /* 自定义比较 */
+ shouldUpdate(test: (props: Object, nextProps: Object) =&gt; boolean): HigherOrderComponent
+ /* 只比较指定key */
+ onlyUpdateForKeys( propKeys: Array&lt;string&gt;): HigherOrderComponent
+</code></pre>
+<p>其实还可以再扩展一下，比如<code>omitUpdateForKeys</code>忽略比对某些 <code>key</code>.</p>
+<p>精细化渲染</p>
+<p>所谓精细化渲染指的是只有一个数据来源导致组件重新渲染, 比如说 <code>A</code> 只依赖于 <code>a</code> 数据，那么只有在 <code>a</code> 数据变动时才渲染 <code>A</code>, 其他状态变化不应该影响组件 <code>A</code>。</p>
+<p><code>Vue</code> 和 <code>Mobx</code> 宣称自己性能好的一部分原因是它们的'响应式系统', 它允许我们定义一些‘响应式数据’，当这些响应数据变动时，依赖这些响应式数据视图就会重新渲染.来看看 Vue 官方是如何描述的:</p>
+<p><a href="https://camo.githubusercontent.com/52e346ee51207b39b412118434c642e4eac640bb02f4aee620b2f289349c42b1/68747470733a2f2f706963622e7a68696d672e636f6d2f38302f76322d38393864396138373365636262646165643762653764306531396135363039395f373230772e6a7067"><img src="https://camo.githubusercontent.com/52e346ee51207b39b412118434c642e4eac640bb02f4aee620b2f289349c42b1/68747470733a2f2f706963622e7a68696d672e636f6d2f38302f76322d38393864396138373365636262646165643762653764306531396135363039395f373230772e6a7067" alt="" /></a></p>
+<p>0️⃣ 响应式数据的精细化渲染 大部分情况下，响应式数据可以实现视图精细化的渲染, 但它还是不能避免开发者写出低效的程序. 本质上还是因为组件违背‘单一职责’.</p>
+<p>举个例子，现在有一个 MyComponent 组件，依赖于 A、B、C 三个数据源，来构建一个 vdom 树。现在的问题是什么呢？现在只要 A、B、C 任意一个变动，那么 MyComponent 整个就会重新渲染:</p>
+<p>更好的做法是让组件的职责更单一，精细化地依赖响应式数据，或者说对响应式数据进行‘隔离’. 如下图, A、B、C 都抽取各自的组件中了，现在 A 变动只会渲染 A 组件本身，而不会影响父组件和 B、C 组件:</p>
+<p>举一个典型的例子，列表渲染:</p>
+<pre><code class="language-js">import React from 'react';
+import { observable } from 'mobx';
+import { observer } from 'mobx-react-lite';
+
+const initialList = [];
+for (let i = 0; i &lt; 10; i++) {
+  initialList.push({ id: i, name: `name-${i}`, value: 0 });
+}
+
+const store = observable({
+  list: initialList,
+});
+
+export const List = observer(() =&gt; {
+  const list = store.list;
+  console.log('List渲染');
+  return (
+    &lt;div className=&quot;list-container&quot;&gt;
+      &lt;ul&gt;
+        {list.map((i, idx) =&gt; (
+          &lt;div className=&quot;list-item&quot; key={i.id}&gt;
+            {/* 假设这是一个复杂的组件 */}
+            {console.log('render', i.id)}
+            &lt;span className=&quot;list-item-name&quot;&gt;{i.name} &lt;/span&gt;
+            &lt;span className=&quot;list-item-value&quot;&gt;{i.value} &lt;/span&gt;
+            &lt;button
+              className=&quot;list-item-increment&quot;
+              onClick={() =&gt; {
+                i.value++;
+                console.log('递增');
+              }}&gt;
+              递增
+            &lt;/button&gt;
+            &lt;button
+              className=&quot;list-item-increment&quot;
+              onClick={() =&gt; {
+                if (idx &lt; list.length - 1) {
+                  console.log('移位');
+                  let t = list[idx];
+                  list[idx] = list[idx + 1];
+                  list[idx + 1] = t;
+                }
+              }}&gt;
+              下移
+            &lt;/button&gt;
+          &lt;/div&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+});
+</code></pre>
+<p>上述的例子是存在性能问题的，单个 <code>list-item</code> 的递增和移位都会导致整个列表的重新渲染:</p>
+<p>原因大概能猜出来吧? 对于 Vue 或者 Mobx 来说，一个组件的渲染函数就是一个依赖收集的上下文。上面 List 组件渲染函数内'访问'了所有的列表项数据，那么 Vue 或 Mobx 就会认为你这个组件依赖于所有的列表项，这样就导致，只要任意一个列表项的属性值变动就会重新渲染整个 List 组件。</p>
+<p>解决办法也很简单，就是将数据隔离抽取到单一职责的组件中。对于 Vue 或 Mobx 来说，越细粒度的组件，可以收获更高的性能优化效果:</p>
+<pre><code class="language-js">export const ListItem = observer(props =&gt; {
+  const { item, onShiftDown } = props;
+  return (
+    &lt;div className=&quot;list-item&quot;&gt;
+      {console.log('render', item.id)}
+      {/* 假设这是一个复杂的组件 */}
+      &lt;span className=&quot;list-item-name&quot;&gt;{item.name} &lt;/span&gt;
+      &lt;span className=&quot;list-item-value&quot;&gt;{item.value} &lt;/span&gt;
+      &lt;button
+        className=&quot;list-item-increment&quot;
+        onClick={() =&gt; {
+          item.value++;
+          console.log('递增');
+        }}
+      &gt;
+        递增
+      &lt;/button&gt;
+      &lt;button className=&quot;list-item-increment&quot; onClick={() =&gt; onShiftDown(item)}&gt;
+        下移
+      &lt;/button&gt;
+    &lt;/div&gt;
+  );
+});
+</code></pre>
+<pre><code class="language-js">export const List = observer(() =&gt; {
+  const list = store.list;
+  const handleShiftDown = useCallback(item =&gt; {
+    const idx = list.findIndex(i =&gt; i.id === item.id);
+    if (idx !== -1 &amp;&amp; idx &lt; list.length - 1) {
+      console.log('移位');
+      let t = list[idx];
+      list[idx] = list[idx + 1];
+      list[idx + 1] = t;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  console.log('List 渲染');
+
+  return (
+    &lt;div className=&quot;list-container&quot;&gt;
+      &lt;ul&gt;
+        {list.map((i, idx) =&gt; (
+          &lt;ListItem key={i.id} item={i} onShiftDown={handleShiftDown} /&gt;
+        ))}
+      &lt;/ul&gt;
+    &lt;/div&gt;
+  );
+});
+</code></pre>
+<p>效果很明显, list-item 递增只会重新渲染本身; 而移位只会重新渲染 List， 因为列表项没有变动, 所以下级 list-item 也不需要重新渲染</p>
+<p>1️⃣ 不要滥用 Context</p>
+<p>其实 Context 的用法和响应式数据正好相反。笔者也看过不少滥用 Context API 的例子, 说到底还是没有处理好‘状态的作用域问题’.</p>
+<p>首先要理解 Context API 的更新特点，它是可以穿透React.memo或者shouldComponentUpdate的比对的，也就是说，一旦 Context 的 Value 变动，所有依赖该 Context 的组件会全部 forceUpdate.</p>
+<p>这个和 Mobx 和 Vue 的响应式系统不同，Context API 并不能细粒度地检测哪些组件依赖哪些状态，所以说上节提到的‘精细化渲染’组件模式，在 Context 这里就成为了‘反模式’.</p>
+<h5 id="总结一下使用-Context-API-要遵循一下原则-">总结一下使用 Context API 要遵循一下原则:</h5>
+<p>明确状态作用域, Context 只放置必要的，关键的，被大多数组件所共享的状态。比较典型的是鉴权状态</p>
+<p>扩展：Context其实有个实验性或者说非公开的选项observedBits, 可以用于控制ContextConsumer是否需要更新. 详细可以看这篇文章&lt;ObservedBits: React Context的秘密功能&gt;. 不过不推荐在实际项目中使用，而且这个API也比较难用，不如直接上mobx。</p>
+<p>粗粒度地订阅 Context 如下图. 细粒度的 Context 订阅会导致不必要的重新渲染, 所以这里推荐粗粒度的订阅. 比如在父级订阅 Context，然后再通过 props 传递给下级。</p>
+<p>另外程墨 Morgan 在避免 React Context 导致的重复渲染一文中也提到 ContextAPI 的一个陷阱:</p>
+<pre><code class="language-js">&lt;Context.Provider
+  value={{ theme: this.state.theme, switchTheme: this.switchTheme }}&gt;
+  &lt;div className=&quot;App&quot;&gt;
+    &lt;Header /&gt;
+    &lt;Content /&gt;
+  &lt;/div&gt;
+&lt;/Context.Provider&gt;
+</code></pre>
+<p>上面的组件会在 state 变化时重新渲染整个组件树，至于为什么留给读者去思考。</p>
+<p>所以我们一般都不会裸露地使用 Context.Provider, 而是封装为独立的 Provider 组件:</p>
+<pre><code class="language-js">export function ThemeProvider(props) {
+  const [theme, switchTheme] = useState(redTheme);
+  return (
+    &lt;Context.Provider value={{ theme, switchTheme }}&gt;
+      {props.children}
+    &lt;/Context.Provider&gt;
+  );
+}
+</code></pre>
+<p>// 顺便暴露useTheme, 让外部必须直接使用Context</p>
+<pre><code class="language-js">export function useTheme() {
+  return useContext(Context);
+}
+</code></pre>
+<p>现在 theme 变动就不会重新渲染整个组件树，因为 props.children 由外部传递进来，并没有发生变动。</p>
+<p>其实上面的代码还有另外一个比较难发现的陷阱(官方文档也有提到):</p>
+<pre><code class="language-js">export function ThemeProvider(props) {
+  const [theme, switchTheme] = useState(redTheme);
+  return (
+    {/*    这里每一次渲染ThemeProvider, 都会创建一个新的value(即使theme和switchTheme没有变动),
+        从而导致强制渲染所有依赖该Context的组件 */}
+    &lt;Context.Provider value={{ theme, switchTheme }}&gt;
+      {props.children}
+    &lt;/Context.Provider&gt;
+  );
+}
+</code></pre>
+<h5 id="所以传递给-Context-的-value-最好做一下缓存-">所以传递给 Context 的 value 最好做一下缓存:</h5>
+<pre><code class="language-js">export function ThemeProvider(props) {
+  const [theme, switchTheme] = useState(redTheme);
+  const value = useMemo(() =&gt; ({ theme, switchTheme }), [theme]);
+  return &lt;Context.Provider value={value}&gt;{props.children}&lt;/Context.Provider&gt;;
+}
+</code></pre>
+<p>原文地址:<a href="https://zhuanlan.zhihu.com/p/74229420">https://zhuanlan.zhihu.com/p/74229420</a></p>
+<h4 id="16--件上传如何做断点续传">16.⽂件上传如何做断点续传</h4>
+<h5 id="前端">前端</h5>
+<p>前端大文件上传网上的大部分文章已经给出了解决方案，核心是利用 <code>Blob.prototype.slice</code> 方法，和数组的 <code>slice</code> 方法相似，调用的 <code>slice</code> 方法可以返回原文件的某个切片</p>
+<p>这样我们就可以根据预先设置好的切片最大数量将文件切分为一个个切片，然后借助 <code>http</code> 的可并发性，同时上传多个切片，这样从原本传一个大文件，变成了同时传多个小的文件切片，可以大大减少上传时间</p>
+<p>另外由于是并发，传输到服务端的顺序可能会发生变化，所以我们还需要给每个切片记录顺序</p>
+<h5 id="服务端">服务端</h5>
+<p>服务端需要负责接受这些切片，并在接收到所有切片后合并切片</p>
+<p>这里又引伸出两个问题</p>
+<p>何时合并切片，即切片什么时候传输完成 如何合并切片</p>
+<p>第一个问题需要前端进行配合，前端在每个切片中都携带切片最大数量的信息，当服务端接受到这个数量的切片时自动合并，也可以额外发一个请求主动通知服务端进行切片的合并</p>
+<p>第二个问题，具体如何合并切片呢？这里可以使用 <code>nodejs</code> 的 <code>api fs.appendFileSync</code>，它可以同步地将数据追加到指定文件，也就是说，当服务端接受到所有切片后，先创建一个最终的文件，然后将所有切片逐步合并到这个文件中</p>
+<h4 id="17-通过什什么做到并发请求-">17.通过什什么做到并发请求?</h4>
+<p>使用异步<code>Prmosie All</code>或者<code>web worker</code></p>
+<h4 id="18-的主要作用和使用方式-">18.<code>redux</code>的主要作用和使用方式?</h4>
+<p>主要作用是：把所有的<code>state</code>集中到组件顶部，能够灵活的将所有<code>state</code>各取所需的分发给所有的组件。</p>
+<p><a href="https://camo.githubusercontent.com/d2218268aef0f10fa2810f4c2d842375ee52d503e993efbf20364cd9e0001bae/68747470733a2f2f70332d6a75656a696e2e62797465696d672e636f6d2f746f732d636e2d692d6b3375316662706663702f39353461343862343362383334616162623039363536663131643537343238327e74706c762d6b3375316662706663702d7a6f6f6d2d312e696d616765"><img src="https://camo.githubusercontent.com/d2218268aef0f10fa2810f4c2d842375ee52d503e993efbf20364cd9e0001bae/68747470733a2f2f70332d6a75656a696e2e62797465696d672e636f6d2f746f732d636e2d692d6b3375316662706663702f39353461343862343362383334616162623039363536663131643537343238327e74706c762d6b3375316662706663702d7a6f6f6d2d312e696d616765" alt="" /></a></p>
+<p><code>store</code>: 保存数据的地方。整个应用智能有一个<code>Store</code>。 <code>state</code>： 包含所有数据，一个<code>state</code>对应一个view。只要<code>state</code>相同，<code>view</code>就相同。 <code>action</code>：<code>View</code>发出的通知<code>action</code>，改变state，从而改变<code>view</code>。修改state的唯一办法是使用<code>Action</code>。</p>
+<h4 id="19-组件通信如何实现-">19.<code>React</code>组件通信如何实现？</h4>
+<h5 id="React组件间通信-式-">React组件间通信⽅式:</h5>
+<h5 id="1---组件向-组件通讯-">1. ⽗组件向⼦组件通讯:</h5>
+<p>⽗组件可以向⼦组件通过传props的⽅式，向⼦组件进⾏通讯</p>
+<h5 id="2---组件向-组件通讯-">2. ⼦组件向⽗组件通讯:</h5>
+<p><code>props</code>+回调的⽅式,⽗组件向⼦组件传递<code>props</code>进⾏通讯，此<code>props</code>为作⽤域为⽗组件⾃身的函数，⼦组件调⽤该函数，将⼦组件想要传递的信息，作为参数，传递到⽗组件的作⽤域中</p>
+<h5 id="3--兄弟组件通信-">3. 兄弟组件通信:</h5>
+<p>找到这两个兄弟节点共同的⽗节点,结合上⾯两种⽅式由⽗节点转发信息进⾏通信</p>
+<h5 id="4--跨层级通信-">4. 跨层级通信:</h5>
+<p><code>Context</code>设计⽬的是为了共享那些对于⼀个组件树⽽⾔是“全局”的数据，例如当前认证的⽤户、主题或⾸选语⾔,对于跨越多层的全局数据通过 <code>Context</code>通信再适合不过</p>
+<p>如果你使用 16.3 以上版本的话，对于这种情况可以使用 Context API。</p>
+<pre><code class="language-js">// 创建 Context，可以在开始就传入值
+const StateContext = React.createContext()
+class Parent extends React.Component {
+  render () {
+    return (
+      // value 就是传入 Context 中的值
+      &lt;StateContext.Provider value='yck'&gt;
+        &lt;Child /&gt;
+      &lt;/StateContext.Provider&gt;
+    )
+  }
+}
+class Child extends React.Component {
+  render () {
+    return (
+      &lt;ThemeContext.Consumer&gt;
+        // 取出值
+        {context =&gt; (
+          name is { context }
+        )}
+      &lt;/ThemeContext.Consumer&gt;
+    );
+  }
+}
+</code></pre>
+<h5 id="5-发布订阅模式-">5.发布订阅模式:</h5>
+<p>发布者发布事件，订阅者监听事件并做出反应,我们可以通过引⼊event模块进⾏通信</p>
+<h5 id="6-全局状态管理-具-">6.全局状态管理⼯具:</h5>
+<p>借助Redux或者Mobx等全局状态管理⼯具进⾏通信,这种⼯具会维护⼀个全局状态中⼼Store,并根据不同的事件产⽣新的状态</p>
+<h5 id="20-中如何进-异步操作-">20.<code>redux</code>中如何进⾏异步操作?</h5>
+<p>当然,我们可以在 <code>componentDidmount</code> 中直接进⾏请求⽆须借助<code>redux</code>.</p>
+<p>但是在⼀定规模的项⽬中,上述⽅法很难进⾏异步流的管理,通常情况下我们会借助redux的异步中间件进⾏异步处理.</p>
+<p><code>redux</code>异步流中间件其实有很多,但是当下主流的异步中间件只有两种<code>redux-thunk</code>、<code>redux-saga</code>，当然<code>redux-observable</code>可能也有资格占据⼀席之地,其余的异步中间件不管是社区活跃度还是npm下载量都⽐较差了.</p>
+<h4 id="21-如何进-组件-逻辑复--">21.<code>React</code>如何进⾏组件/逻辑复⽤?</h4>
+<p>抛开已经被官⽅弃⽤的Mixin,组件抽象的技术⽬前有三种⽐较主流:</p>
+<p>1.⾼阶组件:</p>
+<ul>
+<li>属性代理</li>
+<li>反向继承 2.渲染属性(Render Props) 3.Hooks</li>
+</ul>
+<h5 id="1--阶组件">1.⾼阶组件</h5>
+<p>高阶组件（<code>HOC</code>）是 <code>React</code> 中用于复用组件逻辑的一种高级技巧。<code>HOC</code> 自身不是 <code>React API</code> 的一部分，它是一种基于 <code>React</code> 的组合特性而形成的设计模式。</p>
+<p>简而言之，高阶组件就是一个函数，它接受一个组件为参数，返回一个新组件。</p>
+<h5 id="高阶组件的定义形如下面这样-">高阶组件的定义形如下面这样:</h5>
+<pre><code class="language-js">//接受一个组件 WrappedComponent 作为参数，返回一个新组件 Proxy
+function HocComponent(WrappedComponent) {
+    return class ProxyComponent extends React.Component {
+        render() {
+            return &lt;WrappedComponent {...this.props}&gt;
+        }
+    }
+}
+</code></pre>
+<h5 id="HOC的约定和注意事项">HOC的约定和注意事项</h5>
+<h5 id="约定">约定</h5>
+<ul>
+<li>将不相关的 props 传递给被包裹的组件(HOC应透传与自身无关的 props)</li>
+<li>最大化可组合性</li>
+<li>包装显示名称以便轻松调试</li>
+</ul>
+<h5 id="注意事项">注意事项</h5>
+<ul>
+<li>不要在函数内修改原组件</li>
+<li>使用反向继承方式时，会丢失原本的显示名</li>
+<li>不要在render函数中使用HOC</li>
+</ul>
+<h5 id="高阶组件的缺点-">高阶组件的缺点：</h5>
+<ul>
+<li>难以溯源。如果原始组件<code>A</code>通过好几个<code>HOC</code>的构造，最终生成了组件<code>B</code>，不知道哪个属性来自于哪个<code>HOC</code>，需要翻看每个<code>HOC</code>才知道各自做了什么事情，使用了什么属性。</li>
+<li><code>props</code>属性名的冲突。某个属性可能被多个<code>HOC</code>重复使用。</li>
+<li>静态构建。新的组件是在页面构建之前生成，先有组件，后生成页面。</li>
+</ul>
+<h5 id="2-渲染属性-Render-Props-">2.渲染属性(Render Props)</h5>
+<h5 id="作用">作用</h5>
+<ul>
+<li>功能的复用，与HOC类似。</li>
+<li>组件间数据的单向传递。</li>
+</ul>
+<h5 id="什么是Render-Props-">什么是Render Props？</h5>
+<p>是一个用于告知组件要渲染什么内容的函数属性。该函数返回一个组件，是渲染出来的内容。</p>
+<pre><code class="language-js">class Cat extends React.Component {
+  render() {
+    const mouse = this.props.mouse;
+    return (
+      &lt;p&gt;位置：x:{ mouse.x } y: { mouse.y }&lt;/p&gt;
+    );
+  }
+}
+ 
+class Mouse extends React.Component {
+  constructor(props) {
+    super(props);
+    this.handleMouseMove = this.handleMouseMove.bind(this);
+    this.state = { x: 0, y: 0 };
+  }
+ 
+  handleMouseMove(event) {
+    this.setState({
+      x: event.clientX,
+      y: event.clientY
+    });
+  }
+ 
+  render() {
+    return (
+      &lt;div style={{ height: '100%' }} onMouseMove={this.handleMouseMove}&gt;
+ 
+        {/*
+          Instead of providing a static representation of what &lt;Mouse&gt; renders,
+          use the `render` prop to dynamically determine what to render.
+        */}
+        {this.props.render(this.state)}
+      &lt;/div&gt;
+    );
+  }
+}
+ 
+class MouseTracker extends React.Component {
+  render() {
+    return (
+      &lt;div&gt;
+        &lt;h1&gt;移动鼠标!&lt;/h1&gt;
+        &lt;Mouse render={mouse =&gt; (
+          &lt;Cat mouse={mouse} /&gt;
+        )}/&gt;
+      &lt;/div&gt;
+    );
+  }
+}
+</code></pre>
+<p>通过以上<code>Demo</code>可以看到，<code>Mouse</code>组件通过<code>render</code>属性（属性名也可以是别的名字），指定了渲染哪个子组件，并且子组件可以接收参数值，进而实现内部逻辑。</p>
+<p>再进行分析，发现Mouse组件提供可变数据源，是一个基础数据的提供者，最关键的代码是：</p>
+<p><code>{this.props.render(this.state)}</code></p>
+<p>通过render属性，将数据传递给另外一个组件。至于这个数据拿来干什么，怎么去渲染，就不是它管的事情了。</p>
+<p>因此，整个页面很多地方可能需要用到鼠标坐标数据，以上的例子就可以实现功能的复用。</p>
+<h5 id="相对高阶组件的优点-">相对高阶组件的优点：</h5>
+<ul>
+<li>不用担心props的命名冲突的问题</li>
+<li>可以溯源，子组件的props一定来自父组件。</li>
+<li>是动态构建的，页面在渲染后，可以动态地决定渲染哪个组件。</li>
+<li>所有能用HOC完成的事情，Render Props都可以做，且更加灵活。</li>
+<li>除了功能复用，还可以用作两个组件的单向数据传递。</li>
+</ul>
+<h5 id="3-Hooks-推荐-">3.Hooks(推荐)</h5>
+<p>本来我以为renderProps除了一点点小小的瑕疵，基本上已经很完美了，然而正所谓没有对比就没有伤害，Hooks出来之后，前面的两个看似强大的模式都成了纸老虎。其他不说，首先从代码量上，Hooks就已经完胜了：</p>
+<h5 id="Hooks版本的计数器">Hooks版本的计数器</h5>
+<pre><code class="language-js">import React,{useState} from 'react'
+import {View, Text,Button} from 'react-native'
+ 
+export default function HookCount() {
+    const [count,addCount,minusCount] = countNumber(0);
+    return (
+        &lt;View style={{backgroundColor:theme,flex:1,alignItems:'center',justifyContent:'center'}}&gt;
+            &lt;Text&gt;You clicked {count} times&lt;/Text&gt;
+            &lt;Button onPress={addCount} title={'add'}/&gt;
+            &lt;Button onPress={minusCount} title={'minus'}/&gt;
+            &lt;Button onPress={changeTheme} title={'ChangeTheme'}/&gt;
+        &lt;/View&gt;
+    );
+}
+ 
+function countNumber(initNumber) {
+    const [count, setCount] = useState(initNumber);
+    const addCount=()=&gt; setCount(count + 1);
+    const minusCount=()=&gt;setCount(count -1);
+    return [
+        count,
+        addCount,
+        minusCount
+    ]
+}
+</code></pre>
+<p>在一个函数中定义的<code>state</code>，竟然可以直接拿到另一个函数中使用，然而有了<code>Hooks</code>，这种看似不可能的语法确实行得通。<code>Hooks</code>的优势不仅体现在代码量上，从风格上来说，也显得语义更清晰、结构更优雅（相比之下，高阶组件和<code>renderProps</code>的语法都显得比较诡异）。更重要的是，上述两种模式所拥有的种种缺点，它一个都没有。</p>
+<p>当我们复用的逻辑达到多个的时候，这种优势会表现得更加明显。</p>
+<h4 id="22-类组件和函数组件之间的区别是啥-">22.类组件和函数组件之间的区别是啥？</h4>
+<p>类组件可以使用其他特性，如状态 <code>state</code> 和生命周期钩子。</p>
+<p>当组件只是接收 <code>props</code> 渲染到页面时，就是无状态组件，就属于函数组件，也被称为哑组件或展示组件。</p>
+<p>函数组件和类组件当然是有区别的，而且函数组件的性能比类组件的性能要高，因为类组件使用的时候要实例化，而函数组件直接执行函数取返回结果即可。为了提高性能，尽量使用函数组件。</p>
+<p>区别函数组件类组件是否有 <code>this</code>没有有是否有生命周期没有有是否有状态 <code>state</code>没有有</p>
+<h4 id="23-你了解--吗-解释一下它的工作原理-">23.你了解 <code>Virtual DOM</code> 吗？解释一下它的工作原理?</h4>
+<p><code>Virtual DOM</code> 是一个轻量级的 JavaScript 对象，它最初只是 <code>real DOM</code> 的副本。它是一个节点树，它将元素、它们的属性和内容作为对象及其属性。 <code>React</code> 的渲染函数从 <code>React</code> 组件中创建一个节点树。然后它响应数据模型中的变化来更新该树，该变化是由用户或系统完成的各种动作引起的。</p>
+<p><code>Virtual DOM</code> 工作过程有三个简单的步骤。</p>
+<p>1.每当底层数据发生改变时，整个 <code>UI</code> 都将在 <code>Virtual DOM</code> 描述中重新渲染。</p>
+<p><a href="https://camo.githubusercontent.com/6e07ff1fe09915386ab510fbe97cad679db2d79f3a92a6145bf15acea3df5024/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303139303332353136303133343730382e706e673f782d6f73732d70726f636573733d696d6167652f77617465726d61726b2c747970655f5a6d46755a33706f5a57356e6147567064476b2c736861646f775f31302c746578745f6148523063484d364c7939696247396e4c6d4e7a5a473475626d56304c3256355a57396d5957356e5a57773d2c73697a655f31362c636f6c6f725f4646464646462c745f3730"><img src="https://camo.githubusercontent.com/6e07ff1fe09915386ab510fbe97cad679db2d79f3a92a6145bf15acea3df5024/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303139303332353136303133343730382e706e673f782d6f73732d70726f636573733d696d6167652f77617465726d61726b2c747970655f5a6d46755a33706f5a57356e6147567064476b2c736861646f775f31302c746578745f6148523063484d364c7939696247396e4c6d4e7a5a473475626d56304c3256355a57396d5957356e5a57773d2c73697a655f31362c636f6c6f725f4646464646462c745f3730" alt="" /></a></p>
+<p>2.然后计算之前 DOM 表示与新表示的之间的差异。</p>
+<p><a href="https://camo.githubusercontent.com/420cb5794d0d6c834a6e665ecd63e6b1441cc39cc3bb3f8bf4b6694a633d3edc/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303139303332353136303134353830302e706e673f782d6f73732d70726f636573733d696d6167652f77617465726d61726b2c747970655f5a6d46755a33706f5a57356e6147567064476b2c736861646f775f31302c746578745f6148523063484d364c7939696247396e4c6d4e7a5a473475626d56304c3256355a57396d5957356e5a57773d2c73697a655f31362c636f6c6f725f4646464646462c745f3730"><img src="https://camo.githubusercontent.com/420cb5794d0d6c834a6e665ecd63e6b1441cc39cc3bb3f8bf4b6694a633d3edc/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303139303332353136303134353830302e706e673f782d6f73732d70726f636573733d696d6167652f77617465726d61726b2c747970655f5a6d46755a33706f5a57356e6147567064476b2c736861646f775f31302c746578745f6148523063484d364c7939696247396e4c6d4e7a5a473475626d56304c3256355a57396d5957356e5a57773d2c73697a655f31362c636f6c6f725f4646464646462c745f3730" alt="" /></a></p>
+<p>3.完成计算后，将只用实际更改的内容更新 real DOM。</p>
+<p><a href="https://camo.githubusercontent.com/64f058a9f9d04dd192caceda4387545ea47cbf4fba23cf0b4f3ddff5cf675830/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303139303332353136303135383830382e706e673f782d6f73732d70726f636573733d696d6167652f77617465726d61726b2c747970655f5a6d46755a33706f5a57356e6147567064476b2c736861646f775f31302c746578745f6148523063484d364c7939696247396e4c6d4e7a5a473475626d56304c3256355a57396d5957356e5a57773d2c73697a655f31362c636f6c6f725f4646464646462c745f3730"><img src="https://camo.githubusercontent.com/64f058a9f9d04dd192caceda4387545ea47cbf4fba23cf0b4f3ddff5cf675830/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303139303332353136303135383830382e706e673f782d6f73732d70726f636573733d696d6167652f77617465726d61726b2c747970655f5a6d46755a33706f5a57356e6147567064476b2c736861646f775f31302c746578745f6148523063484d364c7939696247396e4c6d4e7a5a473475626d56304c3256355a57396d5957356e5a57773d2c73697a655f31362c636f6c6f725f4646464646462c745f3730" alt="" /></a></p>
+<h4 id="24-框架的主要问题是什么-">24.<code>MVC</code>框架的主要问题是什么？</h4>
+<p>以下是<code>MVC</code>框架的一些主要问题：</p>
+<ul>
+<li>对 <code>DOM</code> 操作的代价非常高</li>
+<li>程序运行缓慢且效率低下</li>
+<li>内存浪费严重</li>
+<li>由于循环依赖性，组件模型需要围绕 <code>models</code> 和 <code>views</code> 进行创建</li>
+</ul>
+<h4 id="25-解释--的作用-">25.解释 <code>Reducer</code> 的作用?</h4>
+<p><code>Reducers</code> 是纯函数，它规定应用程序的状态怎样因响应 <code>ACTION</code> 而改变。<code>Reducers</code> 通过接受先前的状态和 <code>action</code> 来工作，然后它返回一个新的状态。它根据操作的类型确定需要执行哪种更新，然后返回新的值。如果不需要完成任务，它会返回原来的状态。</p>
+<h4 id="26--有哪些优点-">26.<code>Redux</code> 有哪些优点？</h4>
+<p><code>Redux</code> 的优点如下：</p>
+<ul>
+<li>结果的可预测性 - 由于总是存在一个真实来源，即 <code>store</code> ，因此不存在如何将当前状态与动作和应用的其他部分同步的问题。</li>
+<li>可维护性 - 代码变得更容易维护，具有可预测的结果和严格的结构。</li>
+<li>服务器端渲染 - 你只需将服务器上创建的 <code>store</code> 传到客户端即可。这对初始渲染非常有用，并且可以优化应用性能，从而提供更好的用户体验。</li>
+<li>开发人员工具 - 从操作到状态更改，开发人员可以实时跟踪应用中发生的所有事情。</li>
+<li>社区和生态系统 - <code>Redux</code> 背后有一个巨大的社区，这使得它更加迷人。一个由才华横溢的人组成的大型社区为库的改进做出了贡献，并开发了各种应用。</li>
+<li>易于测试 - <code>Redux</code> 的代码主要是小巧、纯粹和独立的功能。这使代码可测试且独立。 组织 - <code>Redux</code> 准确地说明了代码的组织方式，这使得代码在团队使用时更加一致和简单。</li>
+</ul>
+<h4 id="27-为什么--中使用--关键字--">27.为什么<code>React</code> <code>Router</code> 中使用 <code>switch</code> 关键字 ？</h4>
+<p>虽然 <code>&lt;div&gt; **</code> 用于封装 <code>Router</code> 中的多个路由，当你想要仅显示要在多个定义的路线中呈现的单个路线时，可以使用 <code>“switch”</code> 关键字。使用时，<code>&lt;switch&gt;**</code> 标记会按顺序将已定义的 <code>URL</code> 与已定义的路由进行匹配。找到第一个匹配项后，它将渲染指定的路径。从而绕过其它路线。</p>
+<h4 id="28-说说-的优点-">28.说说<code>React Router</code> 的优点？</h4>
+<h5 id="几个优点是-">几个优点是：</h5>
+<p>1.就像 <code>React</code> 基于组件一样，在 <code>React Router</code> <code>v4</code> 中，API 是 <code>‘All About Components’</code>。可以将 <code>Router</code> 可视化为单个根组件（），其中我们将特定的子路由（）包起来。</p>
+<p>2.无需手动设置历史值：在 <code>React Router</code> <code>v4</code> 中，我们要做的就是将路由包装在 <code>&lt;BrowserRouter&gt;</code> 组件中。</p>
+<p>3.包是分开的：共有三个包，分别用于 <code>Web</code>、<code>Native</code> 和 <code>Core</code>。这使我们应用更加紧凑。基于类似的编码风格很容易进行切换。</p>
+<h4 id="29-列出--的组件-">29.列出 <code>Redux</code> 的组件!</h4>
+<h5 id="-由以下组件组成-"><code>Redux</code> 由以下组件组成：</h5>
+<ul>
+<li><code>Action</code> – 这是一个用来描述发生了什么事情的对象。</li>
+<li><code>Reducer</code> – 这是一个确定状态将如何变化的地方。</li>
+<li><code>Store</code> – 整个程序的状态/对象树保存在<code>Store</code>中。</li>
+<li><code>View</code> – 只显示 Store 提供的数据。</li>
+</ul>
+<h4 id="30--在构造函数中-调用--的目的是什么-">30.(在构造函数中)调用 <code>super(props)</code> 的目的是什么?</h4>
+<p>1.在 super()被调用之前，子类是不能使用 this 的，在 ES2015 中，子类必须在 constructor中调用 super()。</p>
+<p>2.传递props 给 super()的原因则是便于(在子类中)能在 constructor 访问 this.props。</p>
+<h4 id="31-除了在构造函数中绑定--还有其它方式吗-">31.除了在构造函数中绑定 <code>this</code>，还有其它方式吗?</h4>
+<p>你可以使用属性初始值设定项(<code>property initializers</code>)来正确绑定回调，<code>create-react-app</code> 也是默认支持的。</p>
+<p>在回调中你可以使用箭头函数，但问题是每次组件渲染时都会创建一个新的回调。</p>
+<h4 id="32-如何告诉它应该是编译生产环境版本-">32.如何告诉<code>react</code>它应该是编译生产环境版本？</h4>
+<p>通常情况下我们会使用 <code>Webpack</code> 的 <code>DefinePlugin</code> 方法来将 <code>NODE_ENV</code> 变量值设置为 <code>production</code>。</p>
+<p>编译版本中 <code>React</code> 会忽略 <code>propType</code>验证以及其他的告警信息，同时还会降低代码库的大小，<code>React</code> 使用了 <code>Uglify</code> 插件来移除生产环境下不必要的注释等信息。</p>
+<blockquote>
+<p>NODE_ENV是怎么来的?</p>
+</blockquote>
+<p>将生产和开发环境分开无疑是一个不错的实践(比如你是用TS写的源码, 在实际应用到生产时已经被编译成了<code>JS</code>, 源文件毫无用处, 不需要包含进去, 所以生产环境就排除掉<code>TS</code>文件以压缩体积), 落实到<code>node</code>具体实现也有很多方法</p>
+<p><code>NODE_ENV</code>最早是<code>express(web框架)</code>自己定的一个环境变量, 通过设置不同的值以在生产和开发环境作出相应动作. 随着该框架的流行, 通过该值的设置区分生产和开发环境变得广为接受, 很多工具也遵循了该做法</p>
+<h4 id="33--的作用-">33.<code>shouldComponentUpdate</code> 的作用?</h4>
+<p><code>shouldComponentUpdate</code> 允许我们手动地判断是否要进行组件更新根据组件的应用场景设置函数的合理返回值能够帮我们避免不必要的更新</p>
+<h4 id="34--与--的区别是什么-">34.<code>createElement</code> 与 <code>cloneElement</code> 的区别是什么?</h4>
+<p><code>createElement</code> 函数是 JSX 编译之后使用的创建 <code>React Element&lt;span&gt; &lt;/span&gt;</code>的函数。</p>
+<p><code>cloneElement</code> 则是用于复制某个元素并传入新的 <code>Props</code>。</p>
+<h4 id="35-你用过哪些中间件-">35.你用过哪些<code>redux</code>中间件?</h4>
+<p>中间件提供第三方插件的模式自定义拦截</p>
+<pre><code>action -&gt; reducer
+</code></pre>
+<p>的过程。</p>
+<h5 id="变为">变为</h5>
+<pre><code>action -&gt; middlewares -&gt; reducer。
+</code></pre>
+<p>这种机制可以让我们改变数据流实现如异步action action 过滤日志输出异常报告等功能</p>
+<p>1.redux-logger提供日志输出</p>
+<p>2.redux-thunk处理异步操作</p>
+<p>3.redux-promise处理异步操作actionCreator的返回值是promise</p>
+<h4 id="36-有什么缺点-">36.<code>redux</code>有什么缺点?</h4>
+<p>一个组件所需要的数据必须由父组件传过来而不能像<code>flux</code>中直接从<code>store</code>取。</p>
+<p>当一个组件相关数据更新时即使父组件不需要用到这个组件父组件还是会重新<code>render</code>可能会有效率影响或者需要写复杂的<code>shouldComponentUpdate</code>进行判断。</p>
+<h4 id="37-和的区别-">37.<code>vue</code>和<code>react</code>的区别?</h4>
+<h5 id="1-监听数据变化的实现原理不同">1.监听数据变化的实现原理不同</h5>
+<p>Vue通过 getter/setter以及一些函数的劫持，能精确知道数据变化。</p>
+<p>React默认是通过比较引用的方式（diff）进行的，如果不优化可能导致大量不必要的VDOM的重新渲染。为什么React不精确监听数据变化呢？这是因为Vue和React设计理念上的区别，Vue使用的是可变数据，而React更强调数据的不可变，两者没有好坏之分，Vue更加简单，而React构建大型应用的时候更加鲁棒。</p>
+<h5 id="2-数据流的不同">2.数据流的不同</h5>
+<p><a href="https://camo.githubusercontent.com/ab4bd16eada891ce4af001f8bba27e1fde48f2f6557974b9aa2ff6d1675c0dda/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303139303632363135303134303537302e706e673f782d6f73732d70726f636573733d696d6167652f77617465726d61726b2c747970655f5a6d46755a33706f5a57356e6147567064476b2c736861646f775f31302c746578745f6148523063484d364c7939696247396e4c6d4e7a5a473475626d56304c334678587a49324d546b774d5463332c73697a655f31362c636f6c6f725f4646464646462c745f3730"><img src="https://camo.githubusercontent.com/ab4bd16eada891ce4af001f8bba27e1fde48f2f6557974b9aa2ff6d1675c0dda/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303139303632363135303134303537302e706e673f782d6f73732d70726f636573733d696d6167652f77617465726d61726b2c747970655f5a6d46755a33706f5a57356e6147567064476b2c736861646f775f31302c746578745f6148523063484d364c7939696247396e4c6d4e7a5a473475626d56304c334678587a49324d546b774d5463332c73697a655f31362c636f6c6f725f4646464646462c745f3730" alt="" /></a></p>
+<p>Vue1.0中可以实现两种双向绑定：父子组件之间，props可以双向绑定；组件与DOM之间可以通过v-model双向绑定。Vue2.x中去掉了第一种，也就是父子组件之间不能双向绑定了（但是提供了一个语法糖自动帮你通过事件的方式修改），并且Vue2.x已经不鼓励组件对自己的 props进行任何修改了。</p>
+<p>React一直不支持双向绑定，提倡的是单向数据流，称之为onChange/setState()模式。不过由于我们一般都会用Vuex以及Redux等单向数据流的状态管理框架，因此很多时候我们感受不到这一点的区别了。</p>
+<h5 id="3-HoC和mixins">3.HoC和mixins</h5>
+<p>Vue组合不同功能的方式是通过mixins，Vue中组件是一个被包装的函数，并不简单的就是我们定义组件的时候传入的对象或者函数。比如我们定义的模板怎么被编译的？比如声明的props怎么接收到的？这些都是vue创建组件实例的时候隐式干的事。由于vue默默帮我们做了这么多事，所以我们自己如果直接把组件的声明包装一下，返回一个HoC，那么这个被包装的组件就无法正常工作了。</p>
+<p>React组合不同功能的方式是通过HoC(高阶组件）。React最早也是使用mixins的，不过后来他们觉得这种方式对组件侵入太强会导致很多问题，就弃用了mixins转而使用HoC。高阶组件本质就是高阶函数，React的组件是一个纯粹的函数，所以高阶函数对React来说非常简单。</p>
+<h5 id="4-组件通信的区别">4.组件通信的区别</h5>
+<p><a href="https://camo.githubusercontent.com/83e06bec3b66c3154997aa33381fb8d241323bcb8e398493ea6a9b6c6113580e/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303139303632363135303234343737382e706e673f782d6f73732d70726f636573733d696d6167652f77617465726d61726b2c747970655f5a6d46755a33706f5a57356e6147567064476b2c736861646f775f31302c746578745f6148523063484d364c7939696247396e4c6d4e7a5a473475626d56304c334678587a49324d546b774d5463332c73697a655f31362c636f6c6f725f4646464646462c745f3730"><img src="https://camo.githubusercontent.com/83e06bec3b66c3154997aa33381fb8d241323bcb8e398493ea6a9b6c6113580e/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303139303632363135303234343737382e706e673f782d6f73732d70726f636573733d696d6167652f77617465726d61726b2c747970655f5a6d46755a33706f5a57356e6147567064476b2c736861646f775f31302c746578745f6148523063484d364c7939696247396e4c6d4e7a5a473475626d56304c334678587a49324d546b774d5463332c73697a655f31362c636f6c6f725f4646464646462c745f3730" alt="" /></a></p>
+<p>Vue中有三种方式可以实现组件通信：父组件通过props向子组件传递数据或者回调，虽然可以传递回调，但是我们一般只传数据；子组件通过事件向父组件发送消息；通过V2.2.0中新增的provide/inject来实现父组件向子组件注入数据，可以跨越多个层级。</p>
+<p>React中也有对应的三种方式：父组件通过props可以向子组件传递数据或者回调；可以通过 context 进行跨层级的通信，这其实和 provide/inject 起到的作用差不多。React 本身并不支持自定义事件，而Vue中子组件向父组件传递消息有两种方式：事件和回调函数，但Vue更倾向于使用事件。在React中我们都是使用回调函数的，这可能是他们二者最大的区别。</p>
+<h5 id="5-模板渲染方式的不同">5.模板渲染方式的不同</h5>
+<p>在深层上，模板的原理不同，这才是他们的本质区别：React是在组件JS代码中，通过原生JS实现模板中的常见语法，比如插值，条件，循环等，都是通过JS语法实现的，更加纯粹更加原生。而Vue是在和组件JS代码分离的单独的模板中，通过指令来实现的，比如条件语句就需要 v-if 来实现对这一点，这样的做法显得有些独特，会把HTML弄得很乱。</p>
+<p>举个例子，说明React的好处：react中render函数是支持闭包特性的，所以我们import的组件在render中可以直接调用。但是在Vue中，由于模板中使用的数据都必须挂在 this 上进行一次中转，所以我们import 一个组件完了之后，还需要在 components 中再声明下，这样显然是很奇怪但又不得不这样的做法。</p>
+<h5 id="6-渲染过程不同">6.渲染过程不同</h5>
+<p>Vue可以更快地计算出Virtual DOM的差异，这是由于它在渲染过程中，会跟踪每一个组件的依赖关系，不需要重新渲染整个组件树。</p>
+<p>React在应用的状态被改变时，全部子组件都会重新渲染。通过shouldComponentUpdate这个生命周期方法可以进行控制，但Vue将此视为默认的优化。</p>
+<p>如果应用中交互复杂，需要处理大量的UI变化，那么使用Virtual DOM是一个好主意。如果更新元素并不频繁，那么Virtual DOM并不一定适用，性能很可能还不如直接操控DOM。</p>
+<h5 id="7-框架本质不同">7.框架本质不同</h5>
+<p>Vue本质是MVVM框架，由MVC发展而来；</p>
+<p>React是前端组件化框架，由后端组件化发展而来。</p>
+<h5 id="8-Vuex和Redux的区别">8.Vuex和Redux的区别</h5>
+<p>从表面上来说，store注入和使用方式有一些区别。</p>
+<p>在Vuex中，<code>$store</code>被直接注入到了组件实例中，因此可以比较灵活的使用：使用dispatch、commit提交更新，通过mapState或者直接通过this.$store来读取数据。在Redux中，我们每一个组件都需要显示的用connect把需要的props和dispatch连接起来。</p>
+<p>另外，Vuex更加灵活一些，组件中既可以dispatch action，也可以commit updates，而Redux中只能进行dispatch，不能直接调用reducer进行修改。</p>
+<p>从实现原理上来说，最大的区别是两点：Redux使用的是不可变数据，而Vuex的数据是可变的，因此，Redux每次都是用新state替换旧state，而Vuex是直接修改。Redux在检测数据变化的时候，是通过diff的方式比较差异的，而Vuex其实和Vue的原理一样，是通过getter/setter来比较的，这两点的区别，也是因为React和Vue的设计理念不同。React更偏向于构建稳定大型的应用，非常的科班化。相比之下，Vue更偏向于简单迅速的解决问题，更灵活，不那么严格遵循条条框框。因此也会给人一种大型项目用React，小型项目用Vue的感觉。</p>
+<p>原文:jianshu.com/p/eb06903c8bf7</p>
+<h4 id="38--有哪些使用场景">38、<code>React Portal</code> 有哪些使用场景</h4>
+<p>在以前 <code>react</code> 中所有的组件都会位于 <code>#app</code> 下而使用 <code>Portals</code> 提供了一种脱离 <code>#app</code> 的组件 因此 <code>Portals</code> 适合脱离文档流(<code>out of flow</code>) 的组件特别是 <code>position: absolute</code> 与 <code>position: fixed</code>的组件。比如模态框通知警告<code>goTop</code> 等。</p>
+<p>以下是官方一个模态框的示例可以在以下地址中测试效果</p>
+<pre><code class="language-html">&lt;html&gt;
+  &lt;body&gt;
+    &lt;div id=&quot;app&quot;&gt;&lt;/div&gt;
+    &lt;div id=&quot;modal&quot;&gt;&lt;/div&gt;
+    &lt;div id=&quot;gotop&quot;&gt;&lt;/div&gt;
+    &lt;div id=&quot;alert&quot;&gt;&lt;/div&gt;
+  &lt;/body&gt;
+&lt;/html&gt;
+</code></pre>
+<pre><code class="language-js">const modalRoot = document.getElementById('modal');
+
+class Modal extends React.Component {
+  constructor(props) {
+    super(props);
+    this.el = document.createElement('div');
+  }
+
+  componentDidMount() {
+    modalRoot.appendChild(this.el);
+  }
+
+  componentWillUnmount() {
+    modalRoot.removeChild(this.el);
+  }
+
+  render() {
+    return ReactDOM.createPortal(
+      this.props.children,
+      this.el,
+    );
+  }
+}
+</code></pre>
+<p><code>React Hooks</code>当中的<code>useEffect</code>是如何区分生命周期钩子的</p>
+<p><code>useEffect</code>可以看成是<code>componentDidMountcomponentDidUpdate</code>和<code>componentWillUnmount</code>三者的结合。<code>useEffect(callback, [source])</code>接收两个参数调用方式如下</p>
+<pre><code class="language-js">useEffect(() =&gt; {
+   console.log('mounted');
+   
+   return () =&gt; {
+       console.log('willUnmount');
+   }
+ }, [source]);
+</code></pre>
+<p>生命周期函数的调用主要是通过第二个参数[source]来进行控制有如下几种情况</p>
+<ul>
+<li>[source]参数不传时则每次都会优先调用上次保存的函数中返回的那个函数然后再调用外部那个函数</li>
+<li>[source]参数传[]时则外部的函数只会在初始化时调用一次返回的那个函数也只会最终在组件卸载时调用一次</li>
+<li>[source]参数有值时则只会监听到数组中的值发生变化后才优先调用返回的那个函数再调用外部的函数。</li>
+</ul>
+<h4 id="39-什么是高阶组件---">39、什么是高阶组件(<code>HOC</code>)？</h4>
+<blockquote>
+<p>高阶组件(Higher Order Componennt)本身其实不是组件而是一个函数这个函数接收一个元组件作为参数然后返回一个新的增强组件高阶组件的出现本身也是为了逻辑复用</p>
+</blockquote>
+<h5 id="举个例子">举个例子</h5>
+<pre><code class="language-js">function withLoginAuth(WrappedComponent) {
+  return class extends React.Component {
+      
+      constructor(props) {
+          super(props);
+          this.state = {
+            isLogin: false
+          };
+      }
+      
+      async componentDidMount() {
+          const isLogin = await getLoginStatus();
+          this.setState({ isLogin });
+      }
+      
+      render() {
+        if (this.state.isLogin) {
+            return &lt;WrappedComponent {...this.props} /&gt;;
+        }
+        
+        return (&lt;div&gt;您还未登录...&lt;/div&gt;);
+      }
+  }
+}
+</code></pre>
+<h4 id="40-实现的移动应用中如果出现卡顿有哪些可以考虑的优化方案-">40、<code>React</code>实现的移动应用中如果出现卡顿有哪些可以考虑的优化方案？</h4>
+<ul>
+<li>增加<code>shouldComponentUpdate</code>钩子对新旧<code>props</code>进行比较如果值相同则阻止更新避免不必要的渲染或者使用<code>PureReactComponent</code>替代<code>Component</code>其内部已经封装了<code>shouldComponentUpdate</code>的浅比较逻辑</li>
+<li>对于列表或其他结构相同的节点为其中的每一项增加唯一<code>key</code>属性以方便<code>React</code>的<code>diff</code>算法中对该节点的复用减少节点的创建和删除操作</li>
+</ul>
+<p>render函数中减少类似</p>
+<pre><code class="language-js">onClick={() =&gt; {
+    doSomething()
+}}
+</code></pre>
+<p>的写法每次调用<code>render</code>函数时均会创建一个新的函数即使内容没有发生任何变化也会导致节点没必要的重渲染建议将函数保存在组件的成员对象中这样只会创建一次</p>
+<ul>
+<li>组件的props如果需要经过一系列运算后才能拿到最终结果则可以考虑使用<code>reselect</code>库对结果进行缓存如果props值未发生变化则结果直接从缓存中拿避免高昂的运算代价</li>
+<li>webpack-bundle-analyzer分析当前页面的依赖包是否存在不合理性如果存在找到优化点并进行优化</li>
+</ul>
+<h4 id="41--它带来了那些便利-">41. <code>React hooks</code>它带来了那些便利？</h4>
+<ul>
+<li>代码逻辑聚合逻辑复用</li>
+<li><code>HOC</code>嵌套地狱</li>
+<li>代替<code>class</code></li>
+<li><code>React</code> 中通常使用 类定义 或者 函数定义 创建组件:</li>
+</ul>
+<p>在类定义中我们可以使用到许多 <code>React</code> 特性例如 <code>state</code>、 各种组件生命周期钩子等但是在函数定义中我们却无能为力因此 <code>React 16.8</code> 版本推出了一个新功能 (<code>React Hooks</code>)通过它可以更好的在函数定义组件中使用 <code>React</code> 特性。</p>
+<h5 id="好处-">好处:</h5>
+<ul>
+<li>跨组件复用: 其实 <code>render</code> <code>props</code> / <code>HOC</code> 也是为了复用相比于它们Hooks 作为官方的底层 <code>API</code>最为轻量而且改造成本小不会影响原来的* 组件层次结构和传说中的嵌套地狱</li>
+<li>类定义更为复杂</li>
+<li>不同的生命周期会使逻辑变得分散且混乱不易维护和管理</li>
+<li>时刻需要关注<code>this</code>的指向问题</li>
+<li>代码复用代价高高阶组件的使用经常会使整个组件树变得臃肿</li>
+<li>状态与UI隔离: 正是由于 <code>Hooks</code> 的特性状态逻辑会变成更小的粒度并且极容易被抽象成一个自定义 <code>Hooks</code>组件中的状态和 <code>UI</code> 变得更为清晰和隔离。</li>
+</ul>
+<h5 id="注意-">注意:</h5>
+<p>避免在 循环/条件判断/嵌套函数 中调用 <code>hooks</code>保证调用顺序的稳定 只有 函数定义组件 和 <code>hooks</code> 可以调用 <code>hooks</code>避免在 类组件 或者 普通函数 中调用 不能在<code>useEffect</code>中使用<code>useStateReact</code> 会报错提示 类组件不会被替换或废弃不需要强制改造类组件两种方式能并存 重要钩子</p>
+<p>状态钩子 (<code>useState</code>): 用于定义组件的<code>State</code>其到类定义中<code>this.state</code>的功能</p>
+<pre><code class="language-js">// useState 只接受一个参数: 初始状态
+// 返回的是组件名和更改该组件对应的函数
+const [flag, setFlag] = useState(true);
+// 修改状态
+setFlag(false)
+	
+// 上面的代码映射到类定义中:
+this.state = {
+	flag: true	
+}
+const flag = this.state.flag
+const setFlag = (bool) =&gt; {
+    this.setState({
+        flag: bool,
+    })
+}
+</code></pre>
+<h5 id="生命周期钩子--useEffect--">生命周期钩子 (useEffect):</h5>
+<p>类定义中有许多生命周期函数而在 <code>React Hooks</code> 中也提供了一个相应的函数 (<code>useEffect</code>)这里可以看做<code>componentDidMount</code>、<code>componentDidUpdate</code>和<code>componentWillUnmount</code>的结合。</p>
+<ul>
+<li><code>useEffect(callback, [source])</code>接受两个参数</li>
+<li><code>callback</code>: 钩子回调函数</li>
+<li><code>source</code>: 设置触发条件仅当 <code>source</code> 发生改变时才会触发</li>
+<li><code>useEffect</code>钩子在没有传入[source]参数时默认在每次 <code>render</code> 时都会优先调用上次保存的回调中返回的函数后再重新调用回调</li>
+</ul>
+<pre><code class="language-js">useEffect(() =&gt; {
+	// 组件挂载后执行事件绑定
+	console.log('on')
+	addEventListener()
+	// 组件 update 时会执行事件解绑
+	return () =&gt; {
+		console.log('off')
+		removeEventListener()
+	}
+}, [source]);
+
+
+// 每次 source 发生改变时执行结果(以类定义的生命周期便于大家理解):
+// --- DidMount ---
+// 'on'
+// --- DidUpdate ---
+// 'off'
+// 'on'
+// --- DidUpdate ---
+// 'off'
+// 'on'
+// --- WillUnmount --- 
+// 'off'
+</code></pre>
+<p>通过第二个参数我们便可模拟出几个常用的生命周期:</p>
+<ul>
+<li><code>componentDidMount</code>: 传入[]时就只会在初始化时调用一次</li>
+<li><code>const useMount = (fn) =&gt; useEffect(fn, [])</code></li>
+<li><code>componentWillUnmount</code>: 传入[]回调中的返回的函数也只会被最终执行一次</li>
+<li><code>const useUnmount = (fn) =&gt; useEffect(() =&gt; fn, [])</code></li>
+<li><code>mounted</code>: 可以使用 useState 封装成一个高度可复用的 <code>mounted</code> 状态</li>
+</ul>
+<pre><code class="language-js">const useMounted = () =&gt; {
+    const [mounted, setMounted] = useState(false);
+    useEffect(() =&gt; {
+        !mounted &amp;&amp; setMounted(true);
+        return () =&gt; setMounted(false);
+    }, []);
+    return mounted;
+}
+componentDidUpdate: useEffect每次均会执行其实就是排除了 DidMount 后即可
+const mounted = useMounted() 
+useEffect(() =&gt; {
+    mounted &amp;&amp; fn()
+})
+</code></pre>
+<h5 id="其它内置钩子-">其它内置钩子:</h5>
+<ul>
+<li><code>useContext</code>: 获取 <code>context</code> 对象</li>
+<li><code>useReducer</code>: 类似于 <code>Redux</code> 思想的实现但其并不足以替代 Redux可以理解成一个组件内部的 <code>redux</code>: 并不是持久化存储会随着组件被销毁而销毁</li>
+<li>属于组件内部各个组件是相互隔离的单纯用它并无法共享数据</li>
+<li>配合<code>useContext</code>的全局性可以完成一个轻量级的 <code>Redux</code>(<code>easy-peasy</code>)</li>
+<li><code>useCallback</code>: 缓存回调函数避免传入的回调每次都是新的函数实例而导致依赖组件重新渲染具有性能优化的效果</li>
+<li><code>useMemo</code>: 用于缓存传入的 <code>props</code>避免依赖的组件每次都重新渲染</li>
+<li><code>useRef</code>: 获取组件的真实节点</li>
+<li><code>useLayoutEffect</code></li>
+<li>DOM更新同步钩子。用法与useEffect类似只是区别于执行时间点的不同</li>
+<li>useEffect属于异步执行并不会等待 DOM 真正渲染后执行而<code>useLayoutEffect</code>则会真正渲染后才触发</li>
+<li>可以获取更新后的 <code>state</code></li>
+<li>自定义钩子(<code>useXxxxx</code>): 基于 <code>Hooks</code> 可以引用其它 <code>Hooks</code> 这个特性我们可以编写自定义钩子如上面的<code>useMounted</code>。又例如我们需要每个页面自定义标题:</li>
+</ul>
+<pre><code class="language-js">function useTitle(title) {
+  useEffect(
+    () =&gt; {
+      document.title = title;
+    });
+}
+
+// 使用:
+function Home() {
+	const title = '我是首页'
+	useTitle(title)
+	
+	return (
+		&lt;div&gt;{title}&lt;/div&gt;
+	)
+}
+</code></pre>
+<h4 id="42-和区别-">42、<code>pureComponent</code>和<code>FunctionComponent</code>区别？</h4>
+<p><code>PureComponent</code>和<code>Component</code>完全相同</p>
+<p>但是在<code>shouldComponentUpdate</code>实现中<code>PureComponent</code>使用了<code>props</code>和<code>state</code>的浅比较。</p>
+<p>主要作用是用来提高某些特定场景的性能</p>
+<h4 id="43-实现原理-">43、<code>Redux</code>实现原理？</h4>
+<h5 id="为什么要用redux">为什么要用redux</h5>
+<p>在<code>React</code>中数据在组件中是单向流动的数据从一个方向父组件流向子组件通过<code>props</code>,所以两个非父子组件之间通信就相对麻烦<code>redux</code>的出现就是为了解决<code>state</code>里面的数据问题</p>
+<h5 id="Redux设计理念">Redux设计理念</h5>
+<p><code>Redux</code>是将整个应用状态存储到一个地方上称为<code>store</code>,里面保存着一个状态树<code>store</code> <code>tree</code>,组件可以派发(<code>dispatch</code>)行为(<code>action</code>)给<code>store</code>,而不是直接通知其他组件组件内部通过订阅<code>store</code>中的状态<code>state</code>来刷新自己的视图</p>
+<p><a href="https://camo.githubusercontent.com/26991a65967a59b08a3d84de3f25ed4feebae2ed067dd0c84889c92c7ff2adec/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323030383138313832345f313539373734363237353332342e6a7067"><img src="https://camo.githubusercontent.com/26991a65967a59b08a3d84de3f25ed4feebae2ed067dd0c84889c92c7ff2adec/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323030383138313832345f313539373734363237353332342e6a7067" alt="" /></a></p>
+<p>image</p>
+<h5 id="Redux三大原则">Redux三大原则</h5>
+<h5 id="1-唯一数据源">1.唯一数据源</h5>
+<p>整个应用的<code>state</code>都被存储到一个状态树里面并且这个状态树只存在于唯一的<code>store</code>中</p>
+<h5 id="2-保持只读状态">2.保持只读状态</h5>
+<p><code>state</code>是只读的唯一改变<code>state</code>的方法就是触发<code>actionaction</code>是一个用于描述以发生时间的普通对象</p>
+<h5 id="3-数据改变只能通过纯函数来执行">3.数据改变只能通过纯函数来执行</h5>
+<p>使用纯函数来执行修改为了描述<code>action</code>如何改变<code>state</code>的你需要编写<code>reducers</code></p>
+<p>Redux源码</p>
+<pre><code class="language-js">let createStore = (reducer) =&gt; {
+    let state;
+    //获取状态对象
+    //存放所有的监听函数
+    let listeners = [];
+    let getState = () =&gt; state;
+    //提供一个方法供外部调用派发action
+    let dispath = (action) =&gt; {
+        //调用管理员reducer得到新的state
+        state = reducer(state, action);
+        //执行所有的监听函数
+        listeners.forEach((l) =&gt; l())
+    }
+    //订阅状态变化事件当状态改变发生之后执行监听函数
+    let subscribe = (listener) =&gt; {
+        listeners.push(listener);
+    }
+    dispath();
+    return {
+        getState,
+        dispath,
+        subscribe
+    }
+}
+let combineReducers=(renducers)=&gt;{
+    //传入一个renducers管理组返回的是一个renducer
+    return function(state={},action={}){
+        let newState={};
+        for(var attr in renducers){
+            newState[attr]=renducers[attr](state[attr],action)
+
+        }
+        return newState;
+    }
+}
+export {createStore,combineReducers};
+</code></pre>
+<h4 id="44-原理">44、<code>connect</code>原理</h4>
+<p>首先<code>connect</code>之所以会成功是因为<code>Provider</code>组件 在原应用组件上包裹一层使原来整个应用成为<code>Provider</code>的子组件 接收<code>Redux</code>的<code>store</code>作为<code>props</code>通过<code>context</code>对象传递给子孙组件上的<code>connect</code> connect做了些什么。它真正连接 <code>Redux&lt;span&gt; &lt;/span&gt;</code>和 <code>React</code>它包在我们的容器组件的外一层它接收上面 <code>Provider</code> 提供的 <code>store</code> 里面的<code>state</code> 和 <code>dispatch</code>传给一个构造函数返回一个对象以属性形式传给我们的容器组件</p>
+<p><code>connect</code>是一个高阶函数首先传入mapStateToProps、mapDispatchToProps然后返回一个生产Component的函数(wrapWithConnect)然后再将真正的Component作为参数传入wrapWithConnect这样就生产出一个经过包裹的Connect组件 该组件具有如下特点</p>
+<p>通过<code>props.store</code>获取祖先<code>Component</code>的<code>store props</code>包括<code>stateProps</code>、<code>dispatchProps</code>、<code>parentProps</code>,合并在一起得到<code>nextState</code>作为<code>props</code>传给真正的<code>Component componentDidMount</code>时添加事件<code>this.store.subscribe(this.handleChange)</code>实现页面交互 <code>shouldComponentUpdate</code>时判断是否有避免进行渲染提升页面性能并得到nextState componentWillUnmount时移除注册的事件<code>this.handleChange</code></p>
+<p>由于connect的源码过长我们只看主要逻辑</p>
+<pre><code class="language-js">export default function connect(mapStateToProps, mapDispatchToProps, mergeProps, options = {}) {
+  return function wrapWithConnect(WrappedComponent) {
+    class Connect extends Component {
+      constructor(props, context) {
+        // 从祖先Component处获得store
+        this.store = props.store || context.store
+        this.stateProps = computeStateProps(this.store, props)
+        this.dispatchProps = computeDispatchProps(this.store, props)
+        this.state = { storeState: null }
+        // 对stateProps、dispatchProps、parentProps进行合并
+        this.updateState()
+      }
+      shouldComponentUpdate(nextProps, nextState) {
+        // 进行判断当数据发生改变时Component重新渲染
+        if (propsChanged 
+        || mapStateProducedChange 
+        || dispatchPropsChanged) {
+          this.updateState(nextProps)
+            return true
+          }
+        }
+        componentDidMount() {
+          // 改变Component的state
+          this.store.subscribe(() = {
+            this.setState({
+              storeState: this.store.getState()
+            })
+          })
+        }
+        render() {
+          // 生成包裹组件Connect
+          return (
+            &lt;WrappedComponent {...this.nextState} /&gt;
+          )
+        }
+      }
+      Connect.contextTypes = {
+        store: storeShape
+      }
+      return Connect;
+    }
+  }
+</code></pre>
+<h5 id="45--的渲染过程中兄弟节点之间是怎么处理的也就是key值不一样的时候-">45、<code>react</code> 的渲染过程中兄弟节点之间是怎么处理的也就是key值不一样的时候？</h5>
+<p>通常我们输出节点的时候都是<code>map</code>一个数组然后返回一个<code>ReactNode</code>为了方便<code>react</code>内部进行优化</p>
+<p>我们必须给每一个<code>reactNode</code>添加<code>key</code>这个<code>key prop</code>在设计值处不是给开发者用的而是给react用的大概的作用就是给每一个reactNode添加一个身份标识</p>
+<p>方便react进行识别在重渲染过程中如果key一样若组件属性有所变化则<code>react</code>只更新组件对应的属性没有变化则不更新如果<code>key</code>不一样则<code>react</code>先销毁该组件然后重新创建该组件</p>
+<h4 id="46-里的标签和标签有什么区别-">46、<code>react-router</code>里的<code>&lt;Link&gt;</code>标签和<code>&lt;a&gt;</code>标签有什么区别？</h4>
+<p><code>react-router</code>是伴随着<code>react</code>框架出现的路由系统，它也是公认的一种优秀的路由解决方案。</p>
+<p>在使用<code>react-router</code>时候，我们常常会使用其自带的路径跳转组件<code>Link</code>,通过<code>&lt;Link to=&quot;path&quot;&gt;&lt;/Link&gt;</code>实现跳转，对比a标签 ,<code>Link</code>组件避免了不必要的重渲染。</p>
+<h4 id="47--的虚拟是怎么实现的-">47、<code>react</code> 的虚拟<code>dom</code>是怎么实现的？</h4>
+<p>首先说说为什么要使用<code>Virturl DOM</code>因为操作真实<code>DOM</code>的耗费的性能代价太高</p>
+<p>所以<code>react</code>内部使用<code>js</code>实现了一套<code>dom</code>结构在每次操作在和真实<code>dom</code>之前使用实现好的<code>diff</code>算法对虚拟<code>dom</code>进行比较递归找出有变化的dom节点然后对其进行更新操作。</p>
+<p>为了实现虚拟<code>DOM</code>我们需要把每一种节点类型抽象成对象每一种节点类型有自己的属性也就是<code>prop</code>每次进行<code>diff</code>的时候<code>react</code>会先比较该节点类型</p>
+<p>假如节点类型不一样那么<code>react</code>会直接删除该节点然后直接创建新的节点插入到其中假如节点类型一样那么会比较<code>prop</code>是否有更新假如有<code>prop</code>不一样那么<code>react</code>会判定该节点有更新那么重渲染该节点然后在对其子节点进行比较一层一层往下直到没有子节点</p>
+<h4 id="48-如何告诉--它应该编译生产环境版-">48、如何告诉 <code>React</code> 它应该编译生产环境版？</h4>
+<p>通常情况下我们会使用 <code>Webpack</code> 的 <code>DefinePlugin</code> 方法来将 <code>NODE_ENV</code> 变量值设置为 <code>production</code>。</p>
+<p>编译版本中 <code>React</code>会忽略 <code>propType</code> 验证以及其他的告警信息同时还会降低代码库的大小React 使用了 <code>Uglify</code> 插件来移除生产环境下不必要的注释等信息</p>
+<h4 id="49-到底是异步还是同步-">49、<code>setState</code>到底是异步还是同步?</h4>
+<h5 id="有时表现出异步-有时表现出同步">有时表现出异步,有时表现出同步</h5>
+<p>1.<code>setState</code>只在合成事件和钩子函数中是“异步”的在原生事件和<code>setTimeout</code> 中都是同步的</p>
+<p>2.<code>setState</code> 的“异步”并不是说内部由异步代码实现其实本身执行的过程和代码都是同步的</p>
+<p>只是合成事件和钩子函数的调用顺序在更新之前导致在合成事件和钩子函数中没法立马拿到更新后的值</p>
+<p>3.形成了所谓的<code>异步</code>当然可以通过第二个参数<code>setState(partialState, callback)</code>中的<code>callback</code>拿到更新后的结果</p>
+<p>4.<code>setState</code> 的批量更新优化也是建立在“异步”合成事件、钩子函数之上的在原生事件和<code>setTimeout</code> 中不会批量更新在“异步”中如果对同一个值进行多次<code>setState</code>的批量更新策略会对其进行覆盖取最后一次的执行如果是同时<code>setState</code>多个不同的值在更新时会对其进行合并批量更新</p>
+<h4 id="50-你对-的理解-">50、你对 <code>Time Slice</code>的理解?</h4>
+<h5 id="时间分片">时间分片</h5>
+<ul>
+<li>React 在渲染render的时候不会阻塞现在的线程</li>
+<li>如果你的设备足够快你会感觉渲染是同步的</li>
+<li>如果你设备非常慢你会感觉还算是灵敏的</li>
+<li>虽然是异步渲染但是你将会看到完整的渲染而不是一个组件一行行的渲染出来</li>
+<li>同样书写组件的方式</li>
+<li>也就是说这是React背后在做的事情对于我们开发者来说是透明的具体是什么样的效果呢</li>
+</ul>
+<h4 id="51-说说你用有什么坑点-">51、说说你用<code>react</code>有什么坑点？</h4>
+<ol>
+<li>JSX做表达式判断时候需要强转为boolean类型</li>
+</ol>
+<p>如果不使用 !!b 进行强转数据类型会在页面里面输出 0。</p>
+<pre><code class="language-js">render() {
+  const b = 0;
+  return &lt;div&gt;
+    {
+      !!b &amp;&amp; &lt;div&gt;这是一段文本&lt;/div&gt;
+    }
+  &lt;/div&gt;
+}
+</code></pre>
+<ol start="2">
+<li>尽量不要在 <code>componentWillReviceProps</code> 里使用 <code>setState</code>如果一定要使用那么需要判断结束条件不然会出现无限重渲染导致页面崩溃</li>
+<li>给组件添加ref时候尽量不要使用匿名函数因为当组件更新的时候匿名函数会被当做新的<code>prop</code>处理让<code>ref</code>属性接受到新函数的时候<code>react</code>内部会先清空<code>ref</code>也就是会以<code>null</code>为回调参数先执行一次<code>ref</code>这个<code>props</code>然后在以该组件的实例执行一次<code>ref</code>所以用匿名函数做ref的时候有的时候去<code>ref</code>赋值后的属性会取到<code>null</code></li>
+<li>遍历子节点的时候不要用 index 作为组件的 key 进行传入</li>
+</ol>
+<h4 id="52-性能优化方案-">52、<code>react</code>性能优化方案？</h4>
+<ul>
+<li>重写<code>shouldComponentUpdate</code>来避免不必要的<code>dom</code>操作</li>
+<li>使用<code>&lt;span&gt; &lt;/span&gt;production</code> 版本的<code>react.js</code></li>
+<li>使用<code>key</code>来帮助<code>React</code>识别列表中所有子组件的最小变化</li>
+</ul>
+<h4 id="53-算法-">53、<code>diff</code>算法?</h4>
+<ul>
+<li>把树形结构按照层级分解只比较同级元素。</li>
+<li>给列表结构的每个单元添加唯一的key属性方便比较。</li>
+<li><code>React</code> 只会匹配相同 <code>class</code> 的 <code>component</code>这里面的class指的是组件的名字</li>
+<li>合并操作调用<code>&lt;span&gt; &lt;/span&gt;component</code> 的 <code>setState</code> 方法的时候, React 将其标记为 - <code>dirty</code>.到每一个事件循环结束, <code>React</code> 检查所有标记 <code>dirty</code>的 <code>component</code>重新绘制.</li>
+<li>选择性子树渲染。开发人员可以重写<code>shouldComponentUpdate</code>提高<code>diff</code>的性能</li>
+</ul>
+<h4 id="54-传入--函数的第二个参数的作用是什么-">54、传入 <code>setState</code> 函数的第二个参数的作用是什么？</h4>
+<p>该函数会在 setState 函数调用完成并且组件开始重渲染的时候被调用我们可以用该函数来监听渲染是否完成</p>
+<pre><code class="language-js">this.setState(
+  { username: 'tylermcginnis33' },
+  () =&gt; console.log('setState has finished and the component has re-rendered.')
+)
+this.setState((prevState, props) =&gt; {
+  return {
+    streak: prevState.streak + props.count
+  }
+})
+</code></pre>
+<h4 id="55-为什么虚拟会提高性能-">55、为什么虚拟<code>dom</code>会提高性能？</h4>
+<blockquote>
+<p>虚拟dom相当于在js和真实dom中间加了一个缓存利用dom diff算法避免了没有必要的dom操作从而提高性能</p>
+</blockquote>
+<h5 id="具体实现步骤如下">具体实现步骤如下</h5>
+<ul>
+<li>用 <code>JavaScript&lt;span&gt; &lt;/span&gt;</code>对象结构表示 DOM 树的结构然后用这个树构建一个真正的 <code>DOM</code> 树插到文档当中</li>
+<li>当状态变更的时候重新构造一棵新的对象树。然后用新的树和旧的树进行比较记录两棵树差异</li>
+<li>把2所记录的差异应用到步骤1所构建的真正的<code>DOM</code>树上视图就更新</li>
+</ul>
+<h4 id="56-我现在有一个要用在上面绑定点击事件要怎么做-">56、我现在有一个<code>button</code>要用<code>react</code>在上面绑定点击事件要怎么做？</h4>
+<pre><code class="language-js">class Demo {
+  render() {
+    return &lt;button onClick={(e) =&gt; {
+      alert('我点击了按钮')
+    }}&gt;
+      按钮
+    &lt;/button&gt;
+  }
+}
+</code></pre>
+<p>你觉得你这样设置点击事件会有什么问题吗</p>
+<p>由于<code>onClick</code>使用的是匿名函数所有每次重渲染的时候会把该<code>onClick</code>当做一个新的prop来处理会将内部缓存的<code>onClick</code>事件进行重新赋值所以相对直接使用函数来说可能有一点的性能下降</p>
+<p>修改</p>
+<pre><code class="language-js">class Demo {
+
+  onClick = (e) =&gt; {
+    alert('我点击了按钮')
+  }
+
+  render() {
+    return &lt;button onClick={this.onClick}&gt;
+      按钮
+    &lt;/button&gt;
+  }
+</code></pre>
+<h4 id="57-性能优化是哪个周期函数-">57、<code>react</code>性能优化是哪个周期函数？</h4>
+<p><code>shouldComponentUpdate</code> 这个方法用来判断是否需要调用<code>render</code>方法重新描绘<code>dom</code>。因为dom的描绘非常消耗性能如果我们能在</p>
+<p><code>shouldComponentUpdate</code>方法中能够写出更优化的<code>dom diff</code>算法可以极大的提高性能</p>
+<h4 id="58-概述下--中的事件处理逻辑-">58、概述下 <code>React</code> 中的事件处理逻辑？</h4>
+<p>为了解决跨浏览器兼容性问题<code>React</code> 会将浏览器原生事件<code>Browser Native Event</code>封装为合成事件<code>SyntheticEvent</code>传入设置的事件处理器中。</p>
+<p>这里的合成事件提供了与原生事件相同的接口不过它们屏蔽了底层浏览器的细节差异保证了行为的一致性。另外有意思的是React 并没有直接将事件附着到子元素上而是以单一事件监听器的方式将所有的事件发送到顶层进行处理。</p>
+<p>这样 <code>React</code> 在更新 <code>DOM</code> 的时候就不需要考虑如何去处理附着在 <code>DOM</code> 上的事件监听器最终达到优化性能的目的</p>
+<ul>
+<li>Flux 的最大特点就是数据的<code>单向流动</code>。</li>
+<li>用户访问 <code>View</code></li>
+<li>View发出用户的 <code>Action</code></li>
+<li><code>Dispatcher</code> 收到Action要求 <code>Store</code> 进行相应的更新</li>
+<li><code>Store</code> 更新后发出一个&quot;<code>change</code>&quot;事件</li>
+<li><code>View</code> 收到&quot;<code>change</code>&quot;事件后更新页面</li>
+</ul>
+<h4 id="59-如何进行组件-逻辑复用-">59、<code>React</code>如何进行组件/逻辑复用?</h4>
+<p>抛开已经被官方弃用的Mixin,组件抽象的技术目前有三种比较主流:</p>
+<p>高阶组件:</p>
+<ul>
+<li>属性代理</li>
+<li>反向继承</li>
+<li>渲染属性</li>
+<li>react-hooks</li>
+</ul>
+<h3 id="vue面试题及答案系列">vue面试题及答案系列</h3>
+<h4 id="1-与的区别">1.<code>v-if</code>与<code>v-show</code>的区别</h4>
+<h5 id="共同点-">共同点：</h5>
+<p>都能控制元素的显示和隐藏；</p>
+<h5 id="不同点-">不同点：</h5>
+<p>实现本质方法不同，v-show本质就是通过控制css中的display设置为none，控制隐藏，只会编译一次；v-if是动态的向DOM树内添加或者删除DOM元素，若初始值为false，就不会编译了。</p>
+<p>而且v-if不停的销毁和创建比较消耗性能。 总结：如果要频繁切换某节点，使用v-show(切换开销比较小，初始开销较大)。</p>
+<p>如果不需要频繁切换某节点使用v-if（初始渲染开销较小，切换开销比较大）。</p>
+<h4 id="2--与-的优先级-">2.<code>v-if</code> 与 <code>v-for</code>的优先级?</h4>
+<h5 id="核心答案-">核心答案：</h5>
+<ol>
+<li>v-for优先于v-if被解析 2、如果同时出现，每次渲染都会先执行循环再判断条件，无论如何循环都不可避免，浪费了性能 3、要避免出现这种情况，则在外层嵌套template，在这一层进行v-if判断，然后在内部进行v-for循环 4、如果条件出现在循环内部，可通过计算属性提前过滤掉那些不需要显示的项</li>
+</ol>
+<h4 id="3-组件中为什么必须是一个函数-">3.<code>vue</code>组件中<code>data</code>为什么必须是一个函数？</h4>
+<p>如果<code>data</code>是一个函数的话，这样每复用一次组件，就会返回一份新的<code>data</code>，类似于给每个组件实例创建一个私有的数据空间，让各个组件实例维护各自的数据。</p>
+<p>而单纯的写成对象形式，就使得所有组件实例共用了一份<code>data</code>，就会造成一个变了全都会变的结果。</p>
+<p>所以说<code>vue</code>组件的<code>data</code>必须是函数。这都是因为<code>js</code>的特性带来的，跟vue本身设计无关。</p>
+<p><code>js</code>本身的面向对象编程也是基于原型链和构造函数，应该会注意原型链上添加一般都是一个函数方法而不会去添加一个对象了。</p>
+<h4 id="4-之与的区别-">4.<code>VueX</code>之<code>actions</code>与<code>mutations</code>的区别?</h4>
+<h5 id="actions">actions</h5>
+<ol>
+<li>用于通过提交mutation改变数据</li>
+<li>会默认将自身封装为一个<code>Promise</code></li>
+<li>可以包含任意的异步操作</li>
+</ol>
+<h5 id="mutations">mutations</h5>
+<ol>
+<li>通过提交<code>commit</code>改变数据</li>
+<li>只是一个单纯的函数</li>
+<li>不要使用异步操作，异步操作会导致变量不能追踪</li>
+</ol>
+<p><a href="https://camo.githubusercontent.com/6057369fc6f4e7e622b3a463d168c19b994632088d638ef84ba02b90377178ad/68747470733a2f2f696d67636f6e766572742e6373646e696d672e636e2f6148523063484d364c793932645756344c6e5a315a57707a4c6d39795a793932645756344c6e42755a773f782d6f73732d70726f636573733d696d6167652f666f726d61742c706e67"><img src="https://camo.githubusercontent.com/6057369fc6f4e7e622b3a463d168c19b994632088d638ef84ba02b90377178ad/68747470733a2f2f696d67636f6e766572742e6373646e696d672e636e2f6148523063484d364c793932645756344c6e5a315a57707a4c6d39795a793932645756344c6e42755a773f782d6f73732d70726f636573733d696d6167652f666f726d61742c706e67" alt="" /></a></p>
+<h4 id="5-如何在vuex中使用异步修改-">5.如何在vuex中使用异步修改?</h4>
+<p>在调用<code>vuex</code>中的方法<code>action</code>的时候，用<code>promise</code>实现异步修改</p>
+<pre><code class="language-js">const actions = {
+    asyncLogin({ commit }, n){
+        return new Promise(resolve =&gt; {
+            setTimeout(() =&gt; {
+                commit(types.UserLogin, n);
+                resolve();
+            },3000)
+        })
+    }
+}
+</code></pre>
+<h4 id="6-有哪些组件间的通信方式-">6.<code>Vue</code>有哪些组件间的通信方式?</h4>
+<h5 id="核心答案--">核心答案：</h5>
+<blockquote>
+<p>Vue 组件间通信只要指以下 3 类通信： 父子组件通信、隔代组件通信、兄弟组件通信，下面我们分别介绍每种通信方式且会说明此种方法可适用于哪类组件间通信。</p>
+</blockquote>
+<h5 id="方法一">方法一</h5>
+<pre><code class="language-js">props/$emit
+</code></pre>
+<p>父组件<code>A</code>通过<code>props</code>的方式向子组件<code>B</code>传递，<code>B to A</code> 通过在 B 组件中 <code>$emit</code>, <code>A</code> 组件中 <code>v-on</code> 的方式实现。</p>
+<h5 id="1-父组件向子组件传值">1.父组件向子组件传值</h5>
+<p>接下来我们通过一个例子，说明父组件如何向子组件传递值：在子组件Users.vue中如何获取父组件App.vue中的数据</p>
+<pre><code class="language-js">userList:[&quot;Henry&quot;,&quot;Bucky&quot;,&quot;Emily&quot;]
+</code></pre>
+<pre><code class="language-html">//App.vue父组件
+&lt;template&gt;
+  &lt;div id=&quot;app&quot;&gt;
+    &lt;hook-users 
+    :userList=&quot;userList&quot;/&gt;
+    //前者自定义名称便于子组件调用，后者要传递数据名
+  &lt;/div&gt;
+&lt;/template&gt;
+&lt;script&gt;
+import AppUsers from &quot;./Components/AppUsers&quot;
+export default {
+  name: 'App',
+  data(){
+    return{
+      userList:[&quot;Henry&quot;,&quot;Bucky&quot;,&quot;Emily&quot;]
+    }
+  },
+  components:{
+    &quot;app-users&quot;:AppUsers
+  }
+}
+</code></pre>
+<pre><code class="language-html">//users子组件
+&lt;template&gt;
+  &lt;div class=&quot;hello&quot;&gt;
+    &lt;ul&gt;
+      //遍历传递过来的值，然后呈现到页面
+      &lt;li v-for=&quot;user in userList&quot;&gt;{{user}}&lt;/li&gt;
+    &lt;/ul&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+&lt;script&gt;
+export default {
+  name: 'AppUsers',
+  props:{
+    userList:{ 
+      type:Array,
+      required:true
+    }
+  }
+}
+&lt;/script&gt;
+</code></pre>
+<h5 id="总结-">总结：</h5>
+<p>父组件通过<code>props</code>向下传递数据给子组件。注：组件中的数据共有三种形式：<code>data</code>、<code>props</code>、<code>computed</code></p>
+<h5 id="2-子组件向父组件传值-通过事件形式-">2.子组件向父组件传值（通过事件形式）</h5>
+<pre><code class="language-html">// 子组件
+&lt;template&gt;
+  &lt;header&gt;
+    &lt;h1 @click=&quot;changeTitle&quot;&gt;{{title}}&lt;/h1&gt;//绑定一个点击事件
+  &lt;/header&gt;
+&lt;/template&gt;
+&lt;script&gt;
+export default {
+  name: 'AppHeader',
+  data() {
+    return {
+      title:&quot;Vue.js Demo&quot;
+    }
+  },
+  methods:{
+    changeTitle() {
+      this.$emit(&quot;titleChanged&quot;,&quot;子向父组件传值&quot;);
+      //自定义事件  传递值“子向父组件传值”
+    }
+  }
+}
+&lt;/script&gt;
+
+// 父组件
+&lt;template&gt;
+  &lt;div id=&quot;app&quot;&gt;
+    &lt;app-header v-on:titleChanged=&quot;updateTitle&quot; &gt;&lt;/app-header&gt;
+    //与子组件titleChanged自定义事件保持一致
+    // updateTitle($event)接受传递过来的文字
+    &lt;h2&gt;{{title}}&lt;/h2&gt;
+  &lt;/div&gt;
+&lt;/template&gt;
+&lt;script&gt;
+import Header from &quot;./components/Header&quot;
+export default {
+  name: 'App',
+  data(){
+    return{
+      title:&quot;传递的是一个值&quot;
+    }
+  },
+  methods:{
+    updateTitle(e){   //声明这个函数
+      this.title = e;
+    }
+  },
+  components:{
+   &quot;app-header&quot;:Header,
+  }
+}
+&lt;/script&gt;
+</code></pre>
+<h4 id="总结--">总结：</h4>
+<p>子组件通过<code>events</code>给父组件发送消息，实际上就是子组件把自己的数据发送到父组件。</p>
+<h5 id="方法二-on">方法二、<span class="vditor-math">emit/</span>on</h5>
+<p>这种方法通过一个空的<code>Vue</code>实例作为中央事件总线（事件中心），用它来触发事件和监听事件,巧妙而轻量地实现了任何组件间的通信，包括父子、兄弟、跨级。当我们的项目比较大时，可以选择更好的状态管理解决方案<code>vuex</code>。</p>
+<p>1.具体实现方式：</p>
+<pre><code class="language-js">var App=new Vue();
+App.$emit(事件名,数据);
+App.$on(事件名,data =&gt; {});
+</code></pre>
+<p>或者自己实现一个</p>
+<pre><code class="language-js">class MyEventEmitter {
+  constructor() {
+    this.event = {};
+  }
+  // 监听
+  on(type, listener) {
+    if (this.event[type]) {
+      this.event[type].push(listener);
+    } else {
+      this.event[type] = [listener];
+    }
+  }
+  //发送监听
+  emit(type, ...rest) {
+    if (this.event[type]) {
+      this.event[type].map(fn =&gt; fn.apply(this, rest));
+    }
+  }
+  //移除监听器
+  removeListener(type) {
+    if (this.event[type]) {
+      delete this.event[type];
+      console.log(this.event);
+    }
+  }
+  //移除所有的监听器
+  removeAllListener() {
+    this.event = {};
+  }
+}
+
+
+var MyEvent=new MyEventEmitter();
+MyEvent.$emit(事件名,数据);
+MyEvent.$on(事件名,data =&gt; {});
+</code></pre>
+<blockquote>
+<p>但是这种方式，记得在每次触发监听的时候，记得移除上一个监听器</p>
+</blockquote>
+<h5 id="方法三-Vuex与localStorage">方法三、Vuex与localStorage</h5>
+<p>vuex 是 vue 的状态管理器，存储的数据是响应式的。但是并不会保存起来，刷新之后就回到了初始状态，具体做法应该在vuex里数据改变的时候把数据拷贝一份保存到localStorage里面，刷新之后，如果localStorage里有保存的数据，取出来再替换store里的state。</p>
+<pre><code class="language-js">const jsonToString=(json)=&gt;{
+  return JSON.stringify(json)
+}
+
+const stringToJson=(keyName)=&gt;{
+  //暂不验证数据格式
+   return window.localStorage.getItem(keyName)?
+   JSON.parse(window.localStorage.getItem(keyName))
+   :{};
+}
+export default new Vuex.Store({
+  state: {
+    selectCity:stringToJson(&quot;selectCity&quot;)
+  },
+  mutations: {
+    changeCity(state, selectCity) {
+      state.selectCity = selectCity
+      try {
+        window.localStorage.setItem('selectCity',jsonToString(state.selectCity));
+      // 数据改变的时候把数据拷贝一份保存到localStorage里面
+      } catch (e) {}
+    }
+  }
+})
+</code></pre>
+<h5 id="方法四-listeners">方法四、<span class="vditor-math">attrs/</span>listeners</h5>
+<h5 id="如图-">如图:</h5>
+<p><a href="https://camo.githubusercontent.com/405a1ad7a9980591e7f85a5c07cefb35ea532720e5926b7b1536db8e3bce17a5/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323030393137313630305f313630303332393633333830382e706e67"><img src="https://camo.githubusercontent.com/405a1ad7a9980591e7f85a5c07cefb35ea532720e5926b7b1536db8e3bce17a5/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323030393137313630305f313630303332393633333830382e706e67" alt="" /></a></p>
+<h5 id="场景">场景</h5>
+<p>有些变态需求：比如说A父组件里面导入了B组件，可是B组件里面又导入了C组件，现在需要A父组件传值给C组件，或者是C组件需要传值给父组件，这时候就需要用到<span class="vditor-math">attrs和</span>listeners了。</p>
+<h5 id="-attrs">$attrs</h5>
+<p>包含了父作用域中不作为 prop 被识别 (且获取) 的特性绑定 (class 和 style 除外)。当一个组件没有声明任何 prop 时，这里会包含所有父作用域的绑定 (class和 style 除外)，并且可以通过 v-bind=&quot;$attrs&quot; 传入内部组件——在创建高级别的组件时非常有用。（父传孙专用）</p>
+<h5 id="-listener">$listener</h5>
+<p>包含了父作用域中的 (不含 .native 修饰器的) v-on 事件监听器。它可以通过 v-on=&quot;$listeners&quot; 传入内部组件——在创建更高层次的组件时非常有用。（孙传父专用）</p>
+<p>在父组件当中，最外层组件</p>
+<pre><code class="language-html">&lt;template&gt;
+    &lt;div&gt;
+        &lt;Child1 
+        :child1Info=&quot;child1&quot; 
+        :child2Info=&quot;child2&quot; 
+        v-on:test1=&quot;onTest1&quot; 
+        v-on:test2=&quot;onTest2&quot;&gt;
+        &lt;/Child1&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+&lt;script&gt;
+import Child1 from './child1';
+export default {
+    data() {
+        return {
+            child1:&quot;hahha&quot;,
+            child2:&quot;asdsdasd&quot;
+        };
+    },
+    components: { Child1 },
+    methods: {
+        onTest1(msg) {
+            console.log('test1 running...',msg);
+        },
+        onTest2(msg) {
+            console.log('test2 running',msg);
+        }
+    }
+};
+&lt;/script&gt;
+···
+
+//在子组件中
+```html
+&lt;template&gt;
+    &lt;div class=&quot;child-1&quot;&gt;
+        &lt;p&gt;在子组件当中:&lt;/p&gt;
+        &lt;p&gt;props-child1Info: {{child1Info}}&lt;/p&gt;
+        &lt;p&gt;$attrs: {{$attrs}}&lt;/p&gt;
+        &lt;hr&gt;
+        &lt;!-- Child2组件中能直接触发test的原因在于 B组件调用C组件时 使用 v-on 绑定了$listeners 属性 --&gt;
+        &lt;!-- 通过v-bind 绑定$attrs属性，Child2组件可以直接获取到A组件中传递下来的props（除了child1组件中props声明的） --&gt;
+        &lt;Child2 v-bind=&quot;$attrs&quot; v-on=&quot;$listeners&quot;&gt;&lt;/Child2&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+&lt;script&gt;
+import Child2 from './child2';
+export default {
+    props: ['child1Info'],
+    data() {
+        return {};
+    },
+    components: { Child2 },
+    mounted() {
+        this.$emit('test1','嘻嘻');
+    }
+};
+&lt;/script&gt;
+</code></pre>
+<p>//在孙子组件当中：</p>
+<pre><code class="language-html">&lt;template&gt;
+    &lt;div class=&quot;child-2&quot;&gt;
+        &lt;p&gt;在最里层组件当中child2:&lt;/p&gt;
+        &lt;p&gt;props-child2Info: {{child2Info}}&lt;/p&gt;
+        &lt;p&gt; $attrs 的值: {{$attrs}}&lt;/p&gt;
+        &lt;hr&gt;
+    &lt;/div&gt;
+&lt;/template&gt;
+&lt;script&gt;
+export default {
+    props: ['child2Info'],
+    data() {
+        return {};
+    },
+    mounted() {
+        this.$emit('test2','哈哈');
+    }
+};
+&lt;/script&gt;
+</code></pre>
+<h5 id="代码详细说明-">代码详细说明：</h5>
+<p><a href="https://camo.githubusercontent.com/953416c388ba76d30f6289ca4258d9a72c53736bdfa5a71bc252af28c6782bb7/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323030393137313535385f313630303332393531383032302e706e67"><img src="https://camo.githubusercontent.com/953416c388ba76d30f6289ca4258d9a72c53736bdfa5a71bc252af28c6782bb7/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323030393137313535385f313630303332393531383032302e706e67" alt="" /></a></p>
+<p><a href="https://camo.githubusercontent.com/268cdec177825b6c9ab366d6fc6c979cc014412d4757887490c9459cc9c46383/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323030393137313535385f313630303332393532383835342e706e67"><img src="https://camo.githubusercontent.com/268cdec177825b6c9ab366d6fc6c979cc014412d4757887490c9459cc9c46383/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323030393137313535385f313630303332393532383835342e706e67" alt="" /></a></p>
+<p><a href="https://camo.githubusercontent.com/202b0484c61ff5219a44a487398ca7e0968386c4e75edb89e847918c946708b5/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323030393137313630305f313630303332393630333238352e706e67"><img src="https://camo.githubusercontent.com/202b0484c61ff5219a44a487398ca7e0968386c4e75edb89e847918c946708b5/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323030393137313630305f313630303332393630333238352e706e67" alt="" /></a></p>
+<h4 id="7-中双向数据绑定是如何实现的-">7.<code>Vue</code>中双向数据绑定是如何实现的?</h4>
+<p>1.<code>vue.js</code> 则是采用数据劫持结合发布者-订阅者模式的方式。</p>
+<p>2.通过<code>Object.defineProperty()</code>来劫持各个属性的<code>setter</code>，<code>getter</code>.</p>
+<p>3.在数据变动时发布消息给订阅者，触发相应的监听回调。我们先来看<code>Object.defineProperty()</code>这个方法：</p>
+<pre><code class="language-js">var obj  = {};
+Object.defineProperty(obj, 'name', {
+        get: function() {
+            console.log('我被获取了')
+            return val;
+        },
+        set: function (newVal) {
+            console.log('我被设置了')
+        }
+})
+obj.name = 'fei';
+//在给obj设置name属性的时候，触发了set这个方法
+var val = obj.name;
+//在得到obj的name属性，会触发get方法
+</code></pre>
+<h4 id="8-单页面应用和多页面应用区别及优缺点-">8.单页面应用和多页面应用区别及优缺点?</h4>
+<p>单页面应用（<code>SPA</code>），通俗一点说就是指只有一个主页面的应用，浏览器一开始要加载所有必须的 <code>html</code>, <code>js</code>, <code>css</code>。所有的页面内容都包含在这个所谓的主页面中。但在写的时候，还是会分开写（页面片段），然后在交互的时候由路由程序动态载入，单页面的页面跳转，仅刷新局部资源。多应用于<code>pc</code>端。</p>
+<p>多页面（<code>MPA</code>），就是指一个应用中有多个页面，页面跳转时是整页刷新</p>
+<h5 id="单页面的优点-">单页面的优点：</h5>
+<p>1，用户体验好，快，内容的改变不需要重新加载整个页面，基于这一点spa对服务器压力较小</p>
+<p>2，前后端分离</p>
+<p>3，页面效果会比较炫酷（比如切换页面内容时的专场动画）</p>
+<h5 id="单页面缺点-">单页面缺点：</h5>
+<p>1，不利于<code>seo</code></p>
+<p>2，导航不可用，如果一定要导航需要自行实现前进、后退。（由于是单页面不能用浏览器的前进后退功能，所以需要自己建立堆栈管理）</p>
+<p>3，初次加载时耗时多</p>
+<p>4，页面复杂度提高很多</p>
+<h4 id="9-中和优先级-">9.<code>vue</code>中<code>v-if</code>和<code>v-for</code>优先级?</h4>
+<p><code>v-for</code>和<code>v-if</code>不应该一起使用，必要情况下应该替换成<code>computed</code>属性。原因：<code>v-for</code>比<code>v-if</code>优先，如果每一次都需要遍历整个数组，将会影响速度，尤其是当之需要渲染很小一部分的时候。</p>
+<pre><code class="language-html">&lt;li
+  v-for=&quot;user in users&quot;
+  v-if=&quot;user.isActive&quot;
+  :key=&quot;user.id&quot;&gt;
+  {{ user.name }}
+&lt;/li&gt;
+</code></pre>
+<p>如上情况，即使100个user中之需要使用一个数据，也会循环整个数组。</p>
+<pre><code class="language-js">omputed: {
+  activeUsers: function () {
+    return this.users.filter(function (user) {
+      return user.isActive
+    })
+  }
+}
+</code></pre>
+<pre><code class="language-html">&lt;ul&gt;
+  &lt;li
+  v-for=&quot;user in activeUsers&quot; 
+  :key=&quot;user.id&quot;&gt;
+  {{ user.name }}
+  &lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+<h4 id="10-事件的修饰符---">10.<code>Vue</code>事件的修饰符（）？</h4>
+<p>1)<code>.stop</code>：等同于<code>JavaScript</code>中的<code>event.stopPropagation()</code>，防止事件冒泡</p>
+<p>2)<code>.prevent</code>：等同于<code>JavaScript</code>中的<code>event.preventDefault()</code>，防止执行预设的行为（如果事件可取消，则取消该事件，而不停止事件的进一步传播）</p>
+<p>3)<code>.capture</code>：与事件冒泡的方向相反，事件捕获由外到内</p>
+<p>4)<code>.self</code>：只会触发自己范围内的事件，不包含子元素</p>
+<p>5)<code>.once</code>：只会触发一次</p>
+<p>6)<code>.passive</code>：<code>passive</code>表示<code>listener</code>函数不会调用<code>preventDefault（）</code></p>
+<p><code>passive</code>主要用在移动端的<code>scroll</code>事件，来提高浏览器响应速度，提升用户体验。因为<code>passive=true</code>等于提前告诉了浏览器，<code>touchstart</code>和<code>touchmove</code>不会阻止默认事件，手刚开始触摸，浏览器就可以立刻给与响应；</p>
+<p>否则，手触摸屏幕了，但要等待<code>touchstart</code>和<code>touchmove</code>的结果，多了这一步，响应时间就长了，用户体验也就差了。</p>
+<h4 id="11-的两个核心是什么-">11.<code>Vue</code>的两个核心是什么？</h4>
+<h5 id="1-数据驱动-">1、数据驱动：</h5>
+<p>在vue中，数据的改变会驱动视图的自动更新。传统的做法是需要手动改变DOM来使得视图更新，而vue只需要改变数据。</p>
+<h5 id="2-组件">2、组件</h5>
+<p>组件化开发，优点很多，可以很好的降低数据之间的耦合度。将常用的代码封装成组件之后（vue组件封装方法），就能高度的复用，提高代码的可重用性。一个页面/模块可以由多个组件所组成。</p>
+<h4 id="12-和的区别">12、<code>react</code>和<code>vue</code>的区别</h4>
+<h5 id="相同点">相同点</h5>
+<ul>
+<li>数据驱动页面提供响应式的试图组件</li>
+<li>都有<code>virtual DOM</code>,组件化的开发通过<code>props</code>参数进行父子之间组件传递数据都实现了<code>webComponents</code>规范</li>
+<li>数据流动单向都支持服务器的渲染SSR</li>
+<li>都有支持<code>native</code>的方法<code>react</code>有<code>React native vue</code>有<code>wexx</code></li>
+</ul>
+<h5 id="不同点">不同点</h5>
+<ul>
+<li>数据绑定<code>Vue</code>实现了双向的数据绑定<code>react</code>数据流动是单向的</li>
+<li>数据渲染大规模的数据渲染<code>react</code>更快</li>
+<li>使用场景<code>React</code>配合<code>Redux</code>架构适合大规模多人协作复杂项目Vue适合小快的项目</li>
+<li>开发风格<code>react</code>推荐做法<code>jsx</code> + <code>inline style</code>把<code>html</code>和<code>css</code>都写在<code>js</code>了</li>
+<li><code>vue</code>是采用<code>webpack</code> +<code>vue-loader</code>单文件组件格式<code>html</code>, <code>js</code>, <code>css</code>同一个文件</li>
+</ul>
+<h4 id="13-有哪些新特性">13.<code>vue3.0</code>有哪些新特性</h4>
+<h5 id="vue3-0的设计目标">vue3.0的设计目标</h5>
+<ul>
+<li>更小</li>
+<li>更快</li>
+<li>加强TypeScript支持</li>
+<li>加强API设计一致性</li>
+<li>提高自身可维护性</li>
+<li>开放更多底层功能</li>
+</ul>
+<p>具体可以从以下方面来理解</p>
+<h5 id="1-压缩包体积更小">1，压缩包体积更小</h5>
+<p>当前最小化并被压缩的 <code>Vue</code> 运行时大小约为 20kB（2.6.10 版为 22.8kB）。<code>Vue 3.0</code>捆绑包的大小大约会<code>减少一半</code>，即只有<code>10kB</code>！</p>
+<h5 id="2-Object-defineProperty----Proxy">2，Object.defineProperty -&gt; Proxy</h5>
+<p><code>Object.defineProperty</code>是一个相对比较昂贵的操作，因为它直接操作对象的属性，颗粒度比较小。将它替换为<code>es6</code>的<code>Proxy</code>，在目标对象之上架了一层拦截，代理的是对象而不是对象的属性。这样可以将原本对对象属性的操作变为对整个对象的操作，颗粒度变大。</p>
+<p><code>javascript</code>引擎在解析的时候希望对象的结构越稳定越好，如果对象一直在变，可优化性降低，<code>proxy</code>不需要对原始对象做太多操作。</p>
+<h5 id="3-Virtual-DOM-重构">3，Virtual DOM 重构</h5>
+<p>vdom的本质是一个抽象层，用<code>javascript</code>描述界面渲染成什么样子。<code>react</code>用<code>jsx</code>，没办法检测出可以优化的动态代码，所以做时间分片，<code>vue</code>中足够快的话可以不用时间分片。</p>
+<h5 id="传统vdom的性能瓶颈-">传统vdom的性能瓶颈：</h5>
+<p>虽然 Vue 能够保证触发更新的组件最小化，但在单个组件内部依然需要遍历该组件的整个 vdom 树。 传统 vdom 的性能跟模版大小正相关，跟动态节点的数量无关。在一些组件整个模版内只有少量动态节点的情况下，这些遍历都是性能的浪费。 <code>JSX</code> 和手写的 <code>render function</code> 是完全动态的，过度的灵活性导致运行时可以用于优化的信息不足 那为什么不直接抛弃vdom呢？</p>
+<p>高级场景下手写 <code>render function</code> 获得更强的表达力</p>
+<p>生成的代码更简洁</p>
+<h5 id="兼容2-x">兼容2.x</h5>
+<p><code>vue</code>的特点是底层为<code>Virtual DOM</code>，上层包含有大量静态信息的模版。为了兼容手写 <code>render function</code>，最大化利用模版静态信息，<code>vue3.0</code>采用了动静结合的解决方案，将<code>vdom</code>的操作颗粒度变小，每次触发更新不再以组件为单位进行遍历，主要更改如下</p>
+<p>将模版基于动态节点指令切割为嵌套的区块</p>
+<p>每个区块内部的节点结构是固定的</p>
+<p>每个区块只需要以一个 Array 追踪自身包含的动态节点</p>
+<p>vue3.0将 vdom 更新性能由与模版整体大小相关提升为与动态内容的数量相关</p>
+<h5 id="4--更多编译时优化">4, 更多编译时优化</h5>
+<p>Slot 默认编译为函数：父子之间不存在强耦合，提升性能 Monomorphic vnode factory：参数一致化，给它children信息， Compiler-generated flags for vnode/children types</p>
+<h5 id="5-选用Function-based-API">5，选用Function_based API</h5>
+<p>为什么撤销 <code>Class API</code> ?</p>
+<p>1，更好地支持<code>TypeScript</code></p>
+<p><code>Props</code> 和其它需要注入到 <code>this</code> 的属性导致类型声明依然存在问题 <code>Decorators</code>提案的严重不稳定使得依赖它的方案具有重大风险 2，除了类型支持以外 <code>Class API</code> 并不带来任何新的优势</p>
+<p>3，<code>vue</code>中的<code>UI</code>组件很少用到继承，一般都是组合，可以用<code>Function-based API</code></p>
+<h4 id="14-性能优化方法">14.<code>Vue</code>性能优化方法</h4>
+<h5 id="1-编码阶段">1）编码阶段</h5>
+<ul>
+<li>尽量减少data中的数据，data中的数据都会增加getter和setter，会收集对应的watcher；</li>
+<li>如果需要使用v-for给每项元素绑定事件时使用事件代理；</li>
+<li>SPA 页面采用keep-alive缓存组件；</li>
+<li>在更多的情况下，使用v-if替代v-show；</li>
+<li>key保证唯一；</li>
+<li>使用路由懒加载、异步组件；</li>
+<li>防抖、节流；</li>
+<li>第三方模块按需导入；</li>
+<li>长列表滚动到可视区域动态加载；</li>
+<li>图片懒加载；</li>
+</ul>
+<h5 id="2-用户体验-">2）用户体验：</h5>
+<ul>
+<li>骨架屏；</li>
+<li>PWA；</li>
+<li>还可以使用缓存(客户端缓存、服务端缓存)优化、服务端开启gzip压缩等。</li>
+</ul>
+<h5 id="3-SEO优化">3）SEO优化</h5>
+<ul>
+<li>预渲染；</li>
+<li>服务端渲染SSR；</li>
+</ul>
+<h5 id="4-打包优化">4）打包优化</h5>
+<ul>
+<li>压缩代码；</li>
+<li>Tree Shaking/Scope Hoisting；</li>
+<li>使用cdn加载第三方模块；</li>
+<li>多线程打包happypack；</li>
+<li>splitChunks抽离公共文件；</li>
+<li>sourceMap优化；</li>
+</ul>
+<h4 id="15-的原理">15.<code>v-model</code>的原理</h4>
+<p><code>v-model</code>本质就是一个语法糖，可以看成是value + input方法的语法糖。可以通过model属性的prop和event属性来进行自定义。</p>
+<blockquote>
+<p>原生的v-model，会根据标签的不同生成不同的事件和属性。</p>
+</blockquote>
+<blockquote>
+<p>v-model 在内部为不同的输入元素使用不同的属性并抛出不同的事件：</p>
+</blockquote>
+<ol>
+<li>text 和 textarea 元素使用 value 属性和 input 事件；</li>
+<li>checkbox 和 radio 使用 checked 属性和 change 事件；</li>
+<li>select 字段将 value 作为 prop 并将 change 作为事件。</li>
+</ol>
+<h5 id="例子">例子</h5>
+<pre><code class="language-js">model: { 
+  prop: 'checked', 
+  event: 'change' 
+}
+</code></pre>
+<p>如果想要更改 <code>checked</code> 这个 <code>prop</code> 可以在 <code>Vue</code> 的 <code>instance</code> 中用以下这行代码发送 <code>change</code> 这个 <code>event</code>，并将目标的变动值传给 <code>checked</code> 这个 <code>prop</code>。</p>
+<pre><code class="language-js">this.$emit('change', $event.target.value);
+</code></pre>
+<h4 id="16-的实现原理是什么-">16.<code>nextTick</code>的实现原理是什么?</h4>
+<p>在下次 <code>DOM</code> 更新循环结束之后执行延迟回调。<code>nextTick</code>主要使用了宏任务和微任务。根据执行环境分别尝试采用</p>
+<ul>
+<li>Promise</li>
+<li>MutationObserver</li>
+<li>setImmediate</li>
+<li>如果以上都不行则采用setTimeout</li>
+</ul>
+<p>定义了一个异步方法，多次调用<code>nextTick</code>会将方法存入队列中，通过这个异步方法清空当前队列。</p>
+<h4 id="17-谈谈和-">17.谈谈<code>Computed</code>和<code>Watch</code>!</h4>
+<p><code>Computed</code>本质是一个具备缓存的<code>watcher</code>，依赖的属性发生变化就会更新视图。</p>
+<p>适用于计算比较消耗性能的计算场景。当表达式过于复杂时，在模板中放入过多逻辑会让模板难以维护，可以将复杂的逻辑放入计算属性中处理。</p>
+<p><code>Watch</code>没有缓存性，更多的是观察的作用，可以监听某些数据执行回调。</p>
+<p>当我们需要深度监听对象中的属性时，可以打开<code>deep：true</code>选项，这样便会对对象中的每一项进行监听。</p>
+<p>这样会带来性能问题，优化的话可以使用字符串形式监听，如果没有写到组件中，不要忘记使用<code>unWatch</code>手动注销哦。</p>
+<h3 id="javascipr面试题及答案系列面试题及答案系列">javascipr面试题及答案系列面试题及答案系列</h3>
+<h4 id="1--和-事件的先后顺序-">1.<code>Window.onLoad</code> 和 <code>DOMContentLoaded</code>事件的先后顺序?</h4>
+<h5 id="顺序">顺序</h5>
+<p>一般情况下，<code>DOMContentLoaded</code>事件要在<code>window.onload</code>之前执行，当DOM树构建完成的时候就会执行 <code>DOMContentLoaded</code>事件，而<code>window.onload</code>是在页面载入完成的时候，才执行</p>
+<h5 id="区别">区别</h5>
+<ol>
+<li>当 <code>onload</code> 事件触发时，页面上所有的<code>DOM</code>，样式表，脚本，图片，<code>flash</code>都已经加载完成了。</li>
+<li>当 <code>DOMContentLoaded</code> 事件触发时，仅当<code>DOM</code>加载完成，不包括样式表，图片，<code>flash</code>。</li>
+</ol>
+<h4 id="2-怎么实现对象的深拷--">2.怎么实现<code>this</code>对象的深拷⻉?</h4>
+<h5 id="1-一行代码的深拷贝">1)一行代码的深拷贝</h5>
+<pre><code class="language-js">//创建mock数据
+function createData(deep, breadth) {
+    var data = {};
+    var temp = data;
+    for (var i = 0; i &lt; deep; i++) {
+        temp = temp['data'] = {};
+        for (var j = 0; j &lt; breadth; j++) {
+            temp[j] = j;
+        }
+    }
+    return data;
+}
+
+createData(1, 3); 
+// 1层深度，每层有3个数据 {data: {0: 0, 1: 1, 2: 2}}
+</code></pre>
+<pre><code class="language-js">//深拷贝对象
+function cloneJSON(source) {
+    return JSON.parse(JSON.stringify(source));
+}
+</code></pre>
+<p>其实我第一次简单这个方法的时候，由衷的表示佩服，其实利用工具，达到目的，是非常聪明的做法</p>
+<p>下面来测试下cloneJSON有没有溢出的问题，看起来cloneJSON内部也是使用递归的方式</p>
+<pre><code class="language-js">cloneJSON(createData(10000)); 
+//出现错误
+// Maximum call stack size exceeded
+</code></pre>
+<p>既然是用了递归，那循环引用呢？并没有因为死循环而导致栈溢出啊，原来是JSON.stringify内部做了循环引用的检测，正是我们上面提到破解循环引用的第一种方法：循环检测</p>
+<pre><code class="language-js">var a = {};
+a.a = a;
+
+cloneJSON(a) 
+//出现错误
+// Uncaught TypeError: Converting circular structure to JSON
+</code></pre>
+<h5 id="普通简单版本">普通简单版本</h5>
+<p>深拷贝的问题其实可以分解成两个问题，浅拷贝+递归，什么意思呢？假设我们有如下数据</p>
+<pre><code class="language-js">var a1 = {b: {c: {d: 1}};
+</code></pre>
+<p>只需稍加改动上面浅拷贝的代码即可，注意区别</p>
+<pre><code class="language-js">function clone(source) {
+    var target = {};
+    for(var i in source) {
+        if (source.hasOwnProperty(i)) {
+            if (typeof source[i] === 'object') {
+                target[i] = clone(source[i]); // 注意这里
+            } else {
+                target[i] = source[i];
+            }
+        }
+    }
+    return target;
+}
+</code></pre>
+<p>其实上面的代码问题太多了，先来举几个例子吧</p>
+<ul>
+<li>没有对参数做检验</li>
+<li>判断是否对象的逻辑不够严谨</li>
+<li>没有考虑数组的兼容</li>
+</ul>
+<h5 id="进阶版本">进阶版本</h5>
+<p>用循环遍历一棵树，需要借助一个栈，当栈为空时就遍历完了，栈里面存储下一个需要拷贝的节点</p>
+<p>首先我们往栈里放入种子数据，key用来存储放哪一个父元素的那一个子元素拷贝对象</p>
+<p>然后遍历当前节点下的子元素，如果是对象就放到栈里，否则直接拷贝</p>
+<pre><code class="language-js">function cloneLoop(x) {
+  const root = {};
+  // 栈
+  const loopList = [{
+    parent: root,
+    key: undefined,
+    data: x,
+  }]
+  while (loopList.length) {
+    // 深度优先
+    const node = loopList.pop();
+    const parent = node.parent;
+    const key = node.key;
+    const data = node.data;
+    // 初始化赋值目标，key为undefined则拷贝到父元素，否则拷贝到子元素
+    let res = parent;
+    if (typeof key !== &quot;undefined&quot;) {
+      res = parent[key] = {};
+    }
+    for (let k in data) {
+      if (data.hasOwnProperty(k)) {
+        if (typeof data[k] === &quot;object&quot;) {
+          // 下一次循环
+          loopList.push({
+            parent: res,
+            key: k,
+            data: data[k],
+          });
+        } else {
+          res[k] = data[k];
+        }
+      }
+    }
+  }
+  return root;
+}
+</code></pre>
+<h4 id="3----的区别-以及变量提升-函数提升-">3.<code>var</code> <code>let</code> <code>const</code> 的区别，以及变量提升，函数提升?</h4>
+<h5 id="var">var</h5>
+<p>1.不存在块作用域</p>
+<p>2.可以多次声明（覆盖）</p>
+<p>3.存在变量提升：当<code>var a = 1</code>;时候，会先在作用域的最顶端，<code>var a</code>;然后在<code>var a = 1</code>;的位置给a赋值</p>
+<h5 id="let-const">let const</h5>
+<p>1.存在块作用域</p>
+<h5 id="经典例题-">经典例题：</h5>
+<p><code>for</code>循环给多个<code>dom</code>添加时间，输出<code>for</code>循环的角标i,如果用var声明，因为没有块作用域，<code>var</code>会变量提升到外层作用域最顶端，而多次i赋值，最后只保存了最后一次的值，改成let可以解决这个问题（这就是强行解释，具体为什么<code>let</code>可以解决还需要好好看看<code>let</code>)</p>
+<p>2.不可以多次声明</p>
+<p>包括<code>function a() {}</code>;存在后不能<code>let const a</code> 变量提升和函数提升排序的问题需要理解</p>
+<h4 id="4-服务器优缺点-">4.<code>node</code>服务器优缺点?</h4>
+<p>1.优点：事件驱动，是的输入输出性能很高</p>
+<p>2.缺点：<code>cpu</code>计算差，比如做很多计算操作，代码运行效率要求高，所以用底层的语言来做，比如<code>C</code></p>
+<p>3.<code>io</code>密集型：需要处理比较多的任务</p>
+<h4 id="5-和的区别-">5.<code>WebSocket</code>和<code>socket</code>的区别?</h4>
+<p>就像<code>Java</code>和<code>JavaScript</code>，并没有什么太大的关系，但又不能说完全没关系。可以这么说：</p>
+<ul>
+<li>命名方面，Socket是一个深入人心的概念，WebSocket借用了这一概念；</li>
+<li>使用方面，完全两个东西。</li>
+</ul>
+<h5 id="Socket">Socket</h5>
+<p>Socket可以有很多意思，和IT较相关的本意大致是指在端到端的一个连接中，这两个端叫做Socket。对于IT从业者来说，它往往指的是TCP/IP网络环境中的两个连接端，大多数的API提供者（如操作系统，JDK）往往会提供基于这种概念的接口，所以对于开发者来说也往往是在说一种编程概念。同时，操作系统中进程间通信也有Socket的概念，但这个Socket就不是基于网络传输层的协议了</p>
+<h5 id="WebSocket与HTTP的关系">WebSocket与HTTP的关系</h5>
+<p><a href="https://camo.githubusercontent.com/dc3e4290db247eb6751241b4aeeb04504c7fa27e21f0a0a85999da3788a28dfc/68747470733a2f2f696d672d626c6f672e6373646e2e6e65742f32303137303632363134303030393930363f77617465726d61726b2f322f746578742f6148523063446f764c324a736232637559334e6b626935755a585176553078666157526c59584d3d2f666f6e742f3561364c354c32542f666f6e7473697a652f3430302f66696c6c2f49304a42516b46434d413d3d2f646973736f6c76652f37302f677261766974792f536f75746845617374"><img src="https://camo.githubusercontent.com/dc3e4290db247eb6751241b4aeeb04504c7fa27e21f0a0a85999da3788a28dfc/68747470733a2f2f696d672d626c6f672e6373646e2e6e65742f32303137303632363134303030393930363f77617465726d61726b2f322f746578742f6148523063446f764c324a736232637559334e6b626935755a585176553078666157526c59584d3d2f666f6e742f3561364c354c32542f666f6e7473697a652f3430302f66696c6c2f49304a42516b46434d413d3d2f646973736f6c76652f37302f677261766974792f536f75746845617374" alt="" /></a></p>
+<h5 id="相同点-">相同点</h5>
+<p>都是一样基于<code>TCP</code>的，都是可靠性传输协议。</p>
+<p>都是应用层协议。</p>
+<h5 id="不同点--">不同点</h5>
+<p><code>WebSocket</code>是双向通信协议，模拟<code>Socket</code>协议，可以双向发送或接受信息。HTTP是单向的。</p>
+<p><code>WebSocket</code>是需要浏览器和服务器握手进行建立连接的。而<code>http</code>是浏览器发起向服务器的连接，服务器预先并不知道这个连接。</p>
+<h5 id="联系">联系</h5>
+<p><code>WebSocket</code>在建立握手时，数据是通过<code>HTTP</code>传输的。但是建立之后，在真正传输时候是不需要<code>HTTP</code>协议的。</p>
+<h5 id="总结---">总结：</h5>
+<p>在<code>WebSocket</code>中，只需要服务器和浏览器通过<code>HTTP</code>协议进行一个握手的动作，然后单独建立一条<code>TCP</code>的通信通道进行数据的传送。 <code>WebSocket</code>连接的过程是：</p>
+<p>首先，客户端发起<code>http</code>请求，经过3次握手后，建立起TCP连接；http请求里存放<code>WebSocket</code>支持的版本号等信息，如：<code>Upgrade</code>、<code>Connection</code>、<code>WebSocket-Version</code>等；</p>
+<p>然后，服务器收到客户端的握手请求后，同样采用<code>HTTP</code>协议回馈数据；</p>
+<p>最后，客户端收到连接成功的消息后，开始借助于<code>TCP</code>传输信道进行全双工通信</p>
+<h4 id="6-中双向数据绑定是如何实现的-">6.<code>Vue</code>中双向数据绑定是如何实现的?</h4>
+<p>1.<code>vue.js</code> 则是采用数据劫持结合发布者-订阅者模式的方式。</p>
+<p>2.通过<code>Object.defineProperty()</code>来劫持各个属性的<code>setter</code>，<code>getter</code>.</p>
+<p>3.在数据变动时发布消息给订阅者，触发相应的监听回调。我们先来看<code>Object.defineProperty()</code>这个方法：</p>
+<pre><code class="language-js">var obj  = {};
+Object.defineProperty(obj, 'name', {
+        get: function() {
+            console.log('我被获取了')
+            return val;
+        },
+        set: function (newVal) {
+            console.log('我被设置了')
+        }
+})
+obj.name = 'fei';
+//在给obj设置name属性的时候，触发了set这个方法
+var val = obj.name;
+//在得到obj的name属性，会触发get方法
+</code></pre>
+<h4 id="7-单页面应用和多页面应用区别及优缺点-">7.单页面应用和多页面应用区别及优缺点?</h4>
+<p>单页面应用（<code>SPA</code>），通俗一点说就是指只有一个主页面的应用，浏览器一开始要加载所有必须的 <code>html</code>, <code>js</code>, <code>css</code>。所有的页面内容都包含在这个所谓的主页面中。但在写的时候，还是会分开写（页面片段），然后在交互的时候由路由程序动态载入，单页面的页面跳转，仅刷新局部资源。多应用于<code>pc</code>端。</p>
+<p>多页面（<code>MPA</code>），就是指一个应用中有多个页面，页面跳转时是整页刷新</p>
+<h5 id="单页面的优点--">单页面的优点：</h5>
+<p>1，用户体验好，快，内容的改变不需要重新加载整个页面，基于这一点spa对服务器压力较小</p>
+<p>2，前后端分离</p>
+<p>3，页面效果会比较炫酷（比如切换页面内容时的专场动画）</p>
+<h5 id="单页面缺点--">单页面缺点：</h5>
+<p>1，不利于<code>seo</code></p>
+<p>2，导航不可用，如果一定要导航需要自行实现前进、后退。（由于是单页面不能用浏览器的前进后退功能，所以需要自己建立堆栈管理）</p>
+<p>3，初次加载时耗时多</p>
+<p>4，页面复杂度提高很多</p>
+<h4 id="8-中和优先级-">8.<code>vue</code>中<code>v-if</code>和<code>v-for</code>优先级?</h4>
+<p><code>v-for</code>和<code>v-if</code>不应该一起使用，必要情况下应该替换成<code>computed</code>属性。原因：<code>v-for</code>比<code>v-if</code>优先，如果每一次都需要遍历整个数组，将会影响速度，尤其是当之需要渲染很小一部分的时候。</p>
+<pre><code class="language-html">&lt;li
+  v-for=&quot;user in users&quot;
+  v-if=&quot;user.isActive&quot;
+  :key=&quot;user.id&quot;&gt;
+  {{ user.name }}
+&lt;/li&gt;
+</code></pre>
+<p>如上情况，即使100个user中之需要使用一个数据，也会循环整个数组。</p>
+<pre><code class="language-js">omputed: {
+  activeUsers: function () {
+    return this.users.filter(function (user) {
+      return user.isActive
+    })
+  }
+}
+</code></pre>
+<pre><code class="language-html">&lt;ul&gt;
+  &lt;li
+  v-for=&quot;user in activeUsers&quot; 
+  :key=&quot;user.id&quot;&gt;
+  {{ user.name }}
+  &lt;/li&gt;
+&lt;/ul&gt;
+</code></pre>
+<h4 id="9-事件的修饰符---">9.<code>Vue</code>事件的修饰符（）？</h4>
+<p>1)<code>.stop</code>：等同于<code>JavaScript</code>中的<code>event.stopPropagation()</code>，防止事件冒泡</p>
+<p>2)<code>.prevent</code>：等同于<code>JavaScript</code>中的<code>event.preventDefault()</code>，防止执行预设的行为（如果事件可取消，则取消该事件，而不停止事件的进一步传播）</p>
+<p>3)<code>.capture</code>：与事件冒泡的方向相反，事件捕获由外到内</p>
+<p>4)<code>.self</code>：只会触发自己范围内的事件，不包含子元素</p>
+<p>5)<code>.once</code>：只会触发一次</p>
+<p>6)<code>.passive</code>：<code>passive</code>表示<code>listener</code>函数不会调用<code>preventDefault（）</code></p>
+<p><code>passive</code>主要用在移动端的<code>scroll</code>事件，来提高浏览器响应速度，提升用户体验。因为<code>passive=true</code>等于提前告诉了浏览器，<code>touchstart</code>和<code>touchmove</code>不会阻止默认事件，手刚开始触摸，浏览器就可以立刻给与响应；</p>
+<p>否则，手触摸屏幕了，但要等待<code>touchstart</code>和<code>touchmove</code>的结果，多了这一步，响应时间就长了，用户体验也就差了。</p>
+<h4 id="10-的两个核心是什么-">10.<code>Vue</code>的两个核心是什么？</h4>
+<h5 id="1-数据驱动--">1、数据驱动：</h5>
+<p>在vue中，数据的改变会驱动视图的自动更新。传统的做法是需要手动改变DOM来使得视图更新，而vue只需要改变数据。</p>
+<h5 id="2-组件-">2、组件</h5>
+<p>组件化开发，优点很多，可以很好的降低数据之间的耦合度。将常用的代码封装成组件之后（vue组件封装方法），就能高度的复用，提高代码的可重用性。一个页面/模块可以由多个组件所组成。</p>
+<h5 id="11-和的区别">11、<code>react</code>和<code>vue</code>的区别</h5>
+<h5 id="相同点--">相同点</h5>
+<ul>
+<li>数据驱动页面提供响应式的试图组件</li>
+<li>都有<code>virtual DOM</code>,组件化的开发通过<code>props</code>参数进行父子之间组件传递数据都实现了<code>webComponents</code>规范</li>
+<li>数据流动单向都支持服务器的渲染SSR</li>
+<li>都有支持<code>native</code>的方法<code>react</code>有<code>React native vue</code>有<code>wexx</code></li>
+</ul>
+<h5 id="不同点---">不同点</h5>
+<ul>
+<li>数据绑定<code>Vue</code>实现了双向的数据绑定<code>react</code>数据流动是单向的</li>
+<li>数据渲染大规模的数据渲染<code>react</code>更快</li>
+<li>使用场景<code>React</code>配合<code>Redux</code>架构适合大规模多人协作复杂项目Vue适合小快的项目</li>
+<li>开发风格<code>react</code>推荐做法<code>jsx</code> + <code>inline style</code>把<code>html</code>和<code>css</code>都写在<code>js</code>了</li>
+<li><code>vue</code>是采用<code>webpack</code> +<code>vue-loader</code>单文件组件格式<code>html</code>, <code>js</code>, <code>css</code>同一个文件</li>
+</ul>
+<h4 id="12-有哪些新特性">12.<code>vue3.0</code>有哪些新特性</h4>
+<h5 id="vue3-0的设计目标-">vue3.0的设计目标</h5>
+<ul>
+<li>更小</li>
+<li>更快</li>
+<li>加强TypeScript支持</li>
+<li>加强API设计一致性</li>
+<li>提高自身可维护性</li>
+<li>开放更多底层功能</li>
+</ul>
+<p>具体可以从以下方面来理解</p>
+<h5 id="1-压缩包体积更小-">1，压缩包体积更小</h5>
+<p>当前最小化并被压缩的 <code>Vue</code> 运行时大小约为 20kB（2.6.10 版为 22.8kB）。<code>Vue 3.0</code>捆绑包的大小大约会<code>减少一半</code>，即只有<code>10kB</code>！</p>
+<h5 id="2-Object-defineProperty----Proxy-">2，Object.defineProperty -&gt; Proxy</h5>
+<p><code>Object.defineProperty</code>是一个相对比较昂贵的操作，因为它直接操作对象的属性，颗粒度比较小。将它替换为<code>es6</code>的<code>Proxy</code>，在目标对象之上架了一层拦截，代理的是对象而不是对象的属性。这样可以将原本对对象属性的操作变为对整个对象的操作，颗粒度变大。</p>
+<p><code>javascript</code>引擎在解析的时候希望对象的结构越稳定越好，如果对象一直在变，可优化性降低，<code>proxy</code>不需要对原始对象做太多操作。</p>
+<h5 id="3-Virtual-DOM-重构-">3，Virtual DOM 重构</h5>
+<p>vdom的本质是一个抽象层，用<code>javascript</code>描述界面渲染成什么样子。<code>react</code>用<code>jsx</code>，没办法检测出可以优化的动态代码，所以做时间分片，<code>vue</code>中足够快的话可以不用时间分片。</p>
+<h5 id="传统vdom的性能瓶颈--">传统vdom的性能瓶颈：</h5>
+<p>虽然 Vue 能够保证触发更新的组件最小化，但在单个组件内部依然需要遍历该组件的整个 vdom 树。 传统 vdom 的性能跟模版大小正相关，跟动态节点的数量无关。在一些组件整个模版内只有少量动态节点的情况下，这些遍历都是性能的浪费。 <code>JSX</code> 和手写的 <code>render function</code> 是完全动态的，过度的灵活性导致运行时可以用于优化的信息不足 那为什么不直接抛弃vdom呢？</p>
+<p>高级场景下手写 <code>render function</code> 获得更强的表达力</p>
+<p>生成的代码更简洁</p>
+<h5 id="兼容2-x-">兼容2.x</h5>
+<p><code>vue</code>的特点是底层为<code>Virtual DOM</code>，上层包含有大量静态信息的模版。为了兼容手写 <code>render function</code>，最大化利用模版静态信息，<code>vue3.0</code>采用了动静结合的解决方案，将<code>vdom</code>的操作颗粒度变小，每次触发更新不再以组件为单位进行遍历，主要更改如下</p>
+<p>将模版基于动态节点指令切割为嵌套的区块</p>
+<p>每个区块内部的节点结构是固定的</p>
+<p>每个区块只需要以一个 Array 追踪自身包含的动态节点</p>
+<p>vue3.0将 vdom 更新性能由与模版整体大小相关提升为与动态内容的数量相关</p>
+<h5 id="4--更多编译时优化-">4, 更多编译时优化</h5>
+<p>Slot 默认编译为函数：父子之间不存在强耦合，提升性能 Monomorphic vnode factory：参数一致化，给它children信息， Compiler-generated flags for vnode/children types</p>
+<h5 id="5-选用Function-based-API-">5，选用Function_based API</h5>
+<p>为什么撤销 <code>Class API</code> ?</p>
+<p>1，更好地支持<code>TypeScript</code></p>
+<p><code>Props</code> 和其它需要注入到 <code>this</code> 的属性导致类型声明依然存在问题 <code>Decorators</code>提案的严重不稳定使得依赖它的方案具有重大风险 2，除了类型支持以外 <code>Class API</code> 并不带来任何新的优势</p>
+<p>3，<code>vue</code>中的<code>UI</code>组件很少用到继承，一般都是组合，可以用<code>Function-based API</code></p>
+<h3 id="Node面试题及答案系列">Node面试题及答案系列</h3>
+<h4 id="1--使-过的中间件">1. 使⽤过的<code>koa2</code>中间件</h4>
+<h4 id="koa-router">koa-router</h4>
+<p><code>koa.js</code>为了保持自身的精简，并没有像<code>Express.js</code>自带了路由功能，因此<code>koa-router</code>做了很好的补充，作为<code>koa</code>星数最多的中间件，<code>koa-router</code>提供了全面的路由功能，比如类似<code>Express</code>的<code>app.get/post/put</code>的写法，URL命名参数、路由命名、支持加载多个中间件、嵌套路由等</p>
+<h4 id="koa-bodyparser">koa-bodyparser</h4>
+<p><code>koa.js</code>并没有内置<code>Request Body</code>的解析器，当我们需要解析请求体时需要加载额外的中间件，官方提供的<code>koa-bodyparser</code>是个很不错的选择，支<code>持x-www-form-urlencoded</code>, <code>application/json</code>等格式的请求体，但不支持<code>form-data</code>的请求体，需要借助 <code>formidable</code> 这个库，也可以直接使用 <code>koa-body</code> 或 <code>koa-better-body</code></p>
+<h4 id="koa-views">koa-views</h4>
+<p>视图模板渲染中间件，支持<code>ejs</code>, <code>nunjucks</code>等众多模板引擎。</p>
+<h4 id="koa-static">koa-static</h4>
+<p>用作类似<code>Nginx</code>的静态文件服务，在本地开发时特别方便，可用于加载前端文件或后端<code>Fake</code>数据，可结合 <code>koa-compress</code> 和 <code>koa-mount</code> 使用。</p>
+<h4 id="koa-jwt">koa-jwt</h4>
+<p><code>koa-jwt</code>这个中间件使用<code>JWT认证</code>HTTP`请求。</p>
+<h4 id="koa-logger">koa-logger</h4>
+<p><code>koa-logger</code>提供了输出请求日志的功能，包括请求的<code>url</code>、状态码、响应时间、响应体大小等信息，对于调试和跟踪应用程序特别有帮助</p>
+<h4 id="2--原理">2. <code>koa-body</code>原理</h4>
+<p><code>koa-body</code>可以实现文件上传，同时也可以让<code>koa</code>能获取<code>post</code>请求的参数,</p>
+<h4 id="3--介绍自己写过的中间件">3. 介绍自己写过的中间件</h4>
+<h4 id="koa中编写中间件-很简单-">koa中编写中间件，很简单：</h4>
+<p>下边，我是写了一个异常捕获中间件，在app.js中使用app.use（）注册即可：</p>
+<pre><code class="language-js">// errMiddleWare .js
+const errMiddleWare = async (ctx, next) =&gt; {
+    try {
+        // 加上了await ，相当于等所有的中间件都执行完毕后，这个next才会执行
+        await next() 
+    }catch(err) {
+        ctx.body = '服务器异常，请稍后！！！'
+    }
+}
+module.exports = {
+    errMiddleWare
+}
+</code></pre>
+<pre><code class="language-js">//app.js
+const App = require('koa') // koa 框架
+const { errMiddleWare } = require('./errMiddleWare/errMiddleWare.js')
+const app = new App()
+app.use(errMiddleWare) // 注册自定义异常捕获中间件
+app.litsen(3000)
+</code></pre>
+<ol>
+<li>异常捕获中间件，如果你想让异常捕获中间件 捕获 全局所有的异常错误，需要放到所有中间件的前边，原因也很简单，加上await next( )，永远会等到下一个中间件执行完毕之后，它才会返回结果，所以全局的异常捕获中间件 只有放在最前边，才会捕获到代码执行过程中的任何错误：</li>
+</ol>
+<pre><code class="language-js">app.use(async (ctx, next) =&gt; {
+    const res = await next()
+    console.log('1', res)
+})
+ 
+app.use(async (ctx, next) =&gt; {
+    const res = await next()
+    console.log('2', res)
+})
+</code></pre>
+<p>输出结果：</p>
+<p><a href="https://camo.githubusercontent.com/323a04366ff6d0295f4eceface1039e5015f141b4b67998652d526678155a27e/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303230303231303231353630373631342e706e67"><img src="https://camo.githubusercontent.com/323a04366ff6d0295f4eceface1039e5015f141b4b67998652d526678155a27e/68747470733a2f2f696d672d626c6f672e6373646e696d672e636e2f32303230303231303231353630373631342e706e67" alt="" /></a></p>
+<h4 id="4--有没有涉及到">4. 有没有涉及到<code>Cluster</code></h4>
+<p>单个 <code>Node.js</code> 实例运行在单个线程中。 为了充分利用多核系统，有时需要启用一组 <code>Node.js</code> 进程去处理负载任务。</p>
+<pre><code class="language-js">const cluster = require('cluster');
+const http = require('http');
+const numCPUs = require('os').cpus().length;
+
+if (cluster.isMaster) {
+  console.log(`主进程 ${process.pid} 正在运行`);
+
+  // 衍生工作进程。
+  for (let i = 0; i &lt; numCPUs; i++) {
+    cluster.fork();
+  }
+
+  cluster.on('exit', (worker, code, signal) =&gt; {
+    console.log(`工作进程 ${worker.process.pid} 已退出`);
+  });
+} else {
+  // 工作进程可以共享任何 TCP 连接。
+  // 在本例子中，共享的是 HTTP 服务器。
+  http.createServer((req, res) =&gt; {
+    res.writeHead(200);
+    res.end('你好世界\n');
+  }).listen(8000);
+
+  console.log(`工作进程 ${process.pid} 已启动`);
+}
+</code></pre>
+<p><code>cluster</code> 模块可以创建共享服务器端口的子进程。</p>
+<h4 id="5--介绍">5. 介绍<code>pm2</code></h4>
+<p><code>PM2</code>是<code>node</code>进程管理工具，可以利用它来简化很多<code>node</code>应用管理的繁琐任务，如性能监控、自动重启、负载均衡等，而且使用非常简单</p>
+<h4 id="6--挂了的话怎么处理">6. <code>master</code>挂了的话<code>pm2</code>怎么处理</h4>
+<h4 id="介绍">介绍</h4>
+<p>你也许知道，Node.js是一个运行在名叫V8的JavaScript引擎的平台系统。V8本身是单线程运行的，并没有充分利用多核系统能力。 (注：Node执行JS代码运行在V8上，是单线程，但并非真正的单线程架构)</p>
+<h4 id="Node-js的集群模式">Node.js的集群模式</h4>
+<p>幸运的是，Node.js提供了集群模块，简单讲就是复制一些可以共享TCP连接的工作线程。</p>
+<h4 id="工作原理">工作原理</h4>
+<p>集群模块会创建一个master主线程，然后复制任意多份程序并启动，这叫做工作线程。 工作线程通过 IPC 频道进行通信并且使用了 Round-robin algorithm 算法进行工作调度以此实现负载均衡。</p>
+<p>Round-robin调度策略主要是master主线程负责接收所有的连接并派发给下面的各个工作线程。 如何使用</p>
+<h4 id="下面是一个很常见的例子-">下面是一个很常见的例子：</h4>
+<pre><code class="language-js">var cluster = require('cluster');  
+var http    = require('http');  
+var os      = require('os');
+var numCPUs = os.cpus().length;
+if (cluster.isMaster) {  
+  // Master:
+  // Let's fork as many workers as you have CPU cores
+  for (var i = 0; i &lt; numCPUs; ++i) {
+    cluster.fork();
+  }
+} else {
+  // Worker:
+  // Let's spawn a HTTP server
+  // (Workers can share any TCP connection.
+  //  In this case its a HTTP server)
+  http.createServer(function(req, res) {
+    res.writeHead(200);
+    res.end(&quot;hello world&quot;);
+  }).listen(8080);
+}
+</code></pre>
+<p>你可以不受CPU核心限制的创建任意多个工作线程。</p>
+<p>使用原生方法有些麻烦而且你还需要处理如果某个工作线程挂掉了等额外的逻辑。 (注：通过fork()复制的进程都是独立的进程，有着全新的V8实例)</p>
+<p>PM2的方式</p>
+<p>PM2内置了处理上述的逻辑，你不用再写这么多繁琐的代码了。</p>
+<p>只需这样一行： <code>$ pm2 start app.js -i 4</code></p>
+<p><code>-i &lt;number of workers&gt;</code> 表示实例程序的个数。就是工作线程。</p>
+<p>如果i为0表示，会根据当前CPU核心数创建</p>
+<p><a href="https://camo.githubusercontent.com/7a59975e5d7314b4f3adbb53180812f662bf5e4170f5fc797a1e5dee93d95e1f/68747470733a2f2f63646e2e6e6c61726b2e636f6d2f79757175652f302f323032302f776562702f313434303738302f313539333939373134313339302d31656138346232392d376265382d346535372d623634612d3637653339343261356239312e77656270"><img src="https://camo.githubusercontent.com/7a59975e5d7314b4f3adbb53180812f662bf5e4170f5fc797a1e5dee93d95e1f/68747470733a2f2f63646e2e6e6c61726b2e636f6d2f79757175652f302f323032302f776562702f313434303738302f313539333939373134313339302d31656138346232392d376265382d346535372d623634612d3637653339343261356239312e77656270" alt="" /></a></p>
+<h4 id="保持你的程序不中断运行">保持你的程序不中断运行</h4>
+<p>如果有任何工作线程意外挂掉了，PM2会立即重启他们，当前你可以在任何时候重启，只需： <a href="https://camo.githubusercontent.com/72698193f4bd79876abf8db7e76c7d2857cc23a9bc991a5b1af397631bbf4de1/68747470733a2f2f63646e2e6e6c61726b2e636f6d2f79757175652f302f323032302f776562702f313434303738302f313539333939373134353832312d37633834326530372d633836622d343138372d613061312d6534353661386136373062632e77656270"><img src="https://camo.githubusercontent.com/72698193f4bd79876abf8db7e76c7d2857cc23a9bc991a5b1af397631bbf4de1/68747470733a2f2f63646e2e6e6c61726b2e636f6d2f79757175652f302f323032302f776562702f313434303738302f313539333939373134353832312d37633834326530372d633836622d343138372d613061312d6534353661386136373062632e77656270" alt="" /></a></p>
+<h4 id="实时调整集群数量">实时调整集群数量</h4>
+<p>你可以使用命令 pm2 scale 调整你的线程数量， 如 pm2 scale app +3 会在当前基础上加3个工作线程。</p>
+<p><a href="https://camo.githubusercontent.com/c3484b2ca320be9e860885c1d836cd3a92de2af4abc8a856d48f4364d983c8ab/68747470733a2f2f63646e2e6e6c61726b2e636f6d2f79757175652f302f323032302f776562702f313434303738302f313539333939373135303435342d37336231373163302d663335372d343163302d396235652d6639353131353737613263312e77656270"><img src="https://camo.githubusercontent.com/c3484b2ca320be9e860885c1d836cd3a92de2af4abc8a856d48f4364d983c8ab/68747470733a2f2f63646e2e6e6c61726b2e636f6d2f79757175652f302f323032302f776562702f313434303738302f313539333939373135303435342d37336231373163302d663335372d343163302d396235652d6639353131353737613263312e77656270" alt="" /></a></p>
+<h4 id="在生产环境让你的程序永不中断">在生产环境让你的程序永不中断</h4>
+<p>PM2 reload 命令会一个接一个的重启工作线程，在新的工作线程启动后才结束老的工作线程。</p>
+<p>这种方式可以保持你的Node程序始终是运行状态。即使在生产环境下部署了新的代码补丁。</p>
+<p>也可以使用gracefulReload命令达到同样的目的，它不会立即结束工作线程，而是通过IPC向它发送关闭信号，这样它就可以关闭正在进行的连接，还可以在退出之前执行一些自定义任务。这种方式更优雅。</p>
+<pre><code class="language-js">process.on('message', function(msg) {  
+  if (msg === 'shutdown') {
+    close_all_connections();
+    delete_cache();
+    server.close();
+    process.exit(0);
+  }
+});
+</code></pre>
+<h4 id="结论">结论</h4>
+<p>Cluster集群模式非常强悍有用，此功能是在Node 0.10.x 是实验功能，在0.11.x 之后才作为正式发布。</p>
+<p>强烈建议你使用最新版本的Node.js和PM2。</p>
+<h4 id="7--如何和进行通信">7. 如何和<code>MySQL</code>进行通信</h4>
+<blockquote>
+<p>这道题，按照现在的技术发展其实基本不会问了，因为现在肯定是不用原生的node+mysql结合来开发了的，肯定是用koa或者egg这种二次封装过的框架来写了的，所以答案也只能算给我们做个了解吧！</p>
+</blockquote>
+<p>Node.js与MySQL交互操作有很多库，常用最多的是mysql模块，首先需要进行npm安装：</p>
+<p><code>npm install mysql</code></p>
+<p>mysql数注意：安装前先把目录cd到node.exe所在目录下，这样执行安装命令时，会找到目录下node_modules，并安装在此目录下，否则使用mysql时，你会出现 Error: Cannot find module 'mysql'</p>
+<h4 id="链接mysql的流程">链接mysql的流程</h4>
+<pre><code class="language-js">var mysql  = require('mysql');  //调用MySQL模块
+//创建一个connection
+var connection = mysql.createConnection({     
+  host     : '192.168.0.200',       //主机
+  user     : 'root',               //MySQL认证用户名
+  password : 'abcd',        //MySQL认证用户密码
+  port: '3306',                   //端口号
+}); 
+//创建一个connection
+connection.connect(function(err){
+    if(err){        
+          console.log('[query] - :'+err);
+        return;
+    }
+      console.log('[connection connect]  succeed!');
+});  
+
+//执行SQL语句
+connection.query('SELECT 1 + 1 AS solution', function(err, rows, fields) { 
+     if (err) {
+             console.log('[query] - :'+err);
+        return;
+     }
+     console.log('The solution is: ', rows[0].solution);  
+});  
+
+//关闭connection
+connection.end(function(err){
+    if(err){        
+        return;
+    }
+      console.log('[connection end] succeed!');
+});
+</code></pre>
+<p>数据库连接参数说明：</p>
+<p><a href="https://camo.githubusercontent.com/8800c952b064417f9c6e81c37431c231c45c0176b3450b56f1110b68836d143c/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323031303139323334375f313630333132323437323036372e706e67"><img src="https://camo.githubusercontent.com/8800c952b064417f9c6e81c37431c231c45c0176b3450b56f1110b68836d143c/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323031303139323334375f313630333132323437323036372e706e67" alt="" /></a></p>
+<h4 id="MYSQL-CURD操作">MYSQL CURD操作</h4>
+<h4 id="添加">添加</h4>
+<pre><code class="language-js">var mysql = require('mysql');
+var DATABASE = &quot;seckill&quot;;
+var TABLE=&quot;seckill&quot;
+var connection = mysql.createConnection({
+    host:'127.0.0.1',
+    user:'root',
+    password:'12345',
+    port:'3306',
+    database: DATABASE
+});
+connection.connect();
+var addVip = 'insert into seckill(name,number) values(?,?)';
+var param = ['100元秒杀家教机',100];
+connection.query(addVip, param, function(error, result){
+    if(error)
+    {
+        console.log(error.message);
+    }else{
+        console.log('insert id: '+result.insertId);
+    }
+});
+connection.end();
+</code></pre>
+<h4 id="删除">删除</h4>
+<pre><code class="language-js">ar mysql = require('mysql');
+var DATABASE = &quot;node&quot;;
+var TABLE=&quot;seckill&quot;
+var connection = mysql.createConnection({
+    host:'127.0.0.1',
+    user:'root',
+    password:'12345',
+    port:'3306',
+    database: DATABASE
+});
+
+connection.connect();
+var addVip = 'delete from seckill where seckill_id = 1005';
+connection.query(addVip, function(error, result){
+    if(error)
+    {
+        console.log(error.message);
+    }else{
+        console.log('affectedRows: '+result.affectedRows);
+    }
+});
+connection.end();
+</code></pre>
+<h4 id="查找">查找</h4>
+<pre><code class="language-js">var mysql = require(&quot;mysql&quot;);
+var DATABASE = &quot;node&quot;;
+var TABLE=&quot;seckill&quot;
+var connection = mysql.createConnection({
+    host:'127.0.0.1',
+    user:'root',
+    password:'12345',
+    port:'3306',
+});
+
+connection.connect();
+connection.query('use '+DATABASE);
+connection.query('select * from '+TABLE, function(error, results, fields){
+    if (error) {
+        throw error;
+    }
+    if (results) {
+        for(var i = 0; i &lt; results.length; i++)
+        {
+            console.log('%s\t%s',results[i].name,results[i].end_time);
+        }
+    }
+});
+connection.end();
+</code></pre>
+<h4 id="修改">修改</h4>
+<pre><code class="language-js">var mysql = require('mysql');
+var DATABASE = &quot;seckill&quot;;
+var connection = mysql.createConnection({
+    host:'127.0.0.1',
+    user:'root',
+    password:'12345',
+    port:'3306',
+    database: DATABASE
+});
+
+connection.connect();
+var userSql = &quot;update seckill set number = number-1 where seckill_id = ?&quot;;
+var param = [1000, 2];
+connection.query(userSql, param, function (error, result) {
+    if(error)
+    {
+        console.log(error.message);
+    }else{
+        console.log('affectedRows: '+result.affectedRows);
+    }
+});
+connection.end();
+</code></pre>
+<h4 id="结束连接">结束连接</h4>
+<p>结束连接其实有两种方法end()，destory()；</p>
+<blockquote>
+<p>end()方法在queries都结束后执行，end()方法接收一个回调函数，queries执行出错，仍然后结束连接，错误会返回给回调函数err参数，可以在回调函数中处理！ destory() 比较暴力，没有回调函数，即刻执行，不管queries是否完成！</p>
+</blockquote>
+<h4 id="连接池Pooling-connections">连接池Pooling connections</h4>
+<p>1.连接池的创建，使用createPool方法，options和createConntion一致，可以监听connection事件。 比较暴力，没有回调函数，即刻执行，不管queries是否完成！</p>
+<pre><code class="language-js">var mysql = require('mysql');
+//创建连接池
+var pool  = mysql.createPool({
+  host     : '192.168.0.200',
+  user     : 'root',
+  password : 'abcd'
+});
+//监听connection事件
+pool.on('connection', function(connection) {  
+    connection.query('SET SESSION auto_increment_increment=1'); 
+});
+连接池可以直接使用，也可以共享一个连接或管理多个连接（引用官方示例）  
+//直接使用
+pool.query('SELECT 1 + 1 AS solution', function(err, rows, fields) {
+  if (err) throw err;
+  console.log('The solution is: ', rows[0].solution);
+});
+//共享
+pool.getConnection(function(err, connection) {
+  // connected! (unless `err` is set)
+});
+</code></pre>
+<h4 id="连接池配置选项---">连接池配置选项 ：　</h4>
+<p>waitForConnections 　　当连接池没有连接或超出最大限制时，设置为true且会把连接放入队列，设置为false会返回error 　　connectionLimit 　　连接数限制，默认：10 　　queueLimit 　　最大连接请求队列限制，设置为0表示不限制，默认：0 调用connection.release()方法，会把连接放回连接池，等待其它使用者使用! 在实际开发过程中，应该还是使用连接池的方式比较好！ 断线重连 数据库可以因为各种原因导致连接不上，这种就必须有重连接机制！主要判断errorcode:PROTOCOL_CONNECTION_LOST 1.首先去数据库服务器停止MySQL服务2.运行断线重连代码 3.去数据为服务器，开启mysql服务器，再看</p>
+<h4 id="看执行结果">看执行结果</h4>
+<h4 id="断线重连示例源码-">断线重连示例源码：</h4>
+<pre><code class="language-js">var mysql = require('mysql');
+var db_config = {
+  host     : '192.168.0.200',       
+  user     : 'root',              
+  password : 'abcd',       
+  port: '3306',                   
+  database: 'nodesample'  
+};
+var connection;
+function handleDisconnect() {
+  connection = mysql.createConnection(db_config);                                              
+  connection.connect(function(err) {              
+    if(err) {                                     
+      console.log(&quot;进行断线重连：&quot; + new Date());
+      setTimeout(handleDisconnect, 2000);   //2秒重连一次
+      return;
+    }         
+     console.log(&quot;连接成功&quot;);  
+  });   
+
+  connection.on('error', function(err) {
+    console.log('db error', err);
+    if(err.code === 'PROTOCOL_CONNECTION_LOST') { 
+      handleDisconnect();                         
+    } else {                                      
+      throw err;                                 
+    }
+  });
+}
+handleDisconnect()
+</code></pre>
+<h4 id="防止SQL注入">防止SQL注入</h4>
+<p>防止SQL注入，可以使用pool.escape()和connect.escape()</p>
+<pre><code class="language-js">var mysql = require('mysql');
+var pool = mysql.createPool({
+    host: '192.168.0.200',     
+    user: 'root',
+    password:'abcd',
+    port:'3306',
+    database:'nodesample'
+});
+pool.getConnection(function(err,connection){
+    connection.query('SELECT * FROM userinfo WHERE id = ' + '5 OR ID = 6',function(err,result){
+        //console.log(err);
+        console.log(result);
+        connection.release();
+    });
+    connection.query('SELECT * FROM userinfo WHERE id = ' + pool.escape('5 OR ID = 6') ,function(err,result){
+        //console.log(err);
+        console.log(result);
+        connection.release();
+    });
+})
+</code></pre>
+<p>结果可以看出，第1个query拼接条件可以被执行，而通过escape方法转义后的忽略了后面的拼接的部分！ 大家可以看到我前面用的？占位的方式，简单的试了一下，好处并没有这种危险，这里就不提供示例了，在我上面提供的代码上改一下就可以试出来^_^!</p>
+<h4 id="mysql-escapeId-identifier-">mysql.escapeId(identifier)</h4>
+<p>如果不能信任由用户提示的SQL标识符（数据库名，列名，表名），可以使用此方法，官方提供有示例（最常见的是通过列名来排序什么的...） 　　</p>
+<h4 id="mysql-format">mysql.format</h4>
+<p>准备查询，该函数会选择合适的转义方法转义参数</p>
+<h3 id="小程序面试题及答案系列">小程序面试题及答案系列</h3>
+<h4 id="1-如何避免微信小程序中中事件的次触发的问题-">1.如何避免微信小程序中<code>app.js</code>中<code>onShow</code>事件的<code>n</code>次触发的问题？</h4>
+<p>在开发中，遇到了一个小难题，就是<code>app.js</code>中<code>onShow</code>事件总是会因调用其它Api而触发，例如：<code>wx.chooseImage</code>，还有<code>wx.makePhoneCall</code>，<code>wx.previewImage</code>，还有好多都会触发<code>app.js</code>中的<code>onShow</code>事件</p>
+<p>小程序热启动确实是个坑，因为通过扫码或分享进入也会热启动，一般开发者都只在<code>onLaunch</code>处理扫码进入相关逻辑，热启动时就出<code>bug</code>了。</p>
+<p>目前比较好的办法就是<code>onShow</code>中通过首个参数<code>optnios</code>下的<code>scene</code>判断进入的场景，根据场景处理相关逻辑</p>
+<p>如果是转发的场景的话，可以把业务代码写在<code>onLoad</code>函数中,因为分享后的事件不会执行<code>onLoad</code>，只会执行<code>onShow</code></p>
+<h4 id="2-简单描述下微信小程序的相关文件类型-">2、简单描述下微信小程序的相关文件类型？</h4>
+<p>答：微信小程序项目结构主要有四个文件类型,如下：</p>
+<p><code>WXML （WeiXin Markup Language）</code>是框架设计的一套标签语言，结合基础组件、事件系统，可以构建出页面的结构。内部主要是微信自己定义的一套组件。</p>
+<p><code>WXSS (WeiXin Style Sheets)</code>是一套样式语言，用于描述 WXML 的组件样式，</p>
+<p><code>js</code> 逻辑处理，网络请求</p>
+<p><code>json</code> 小程序设置，如页面注册，页面标题及tabBar。</p>
+<p><code>app.json</code></p>
+<p>必须要有这个文件，如果没有这个文件，项目无法运行，因为微信框架把这个作为配置文件入口，整个小程序的全局配置。包括页面注册，网络设置，以及小程序的window背景色，配置导航条样式，配置默认标题。</p>
+<p><code>app.js</code></p>
+<p>必须要有这个文件，没有也是会报错！但是这个文件创建一下就行 什么都不需要写以后我们可以在这个文件中监听并处理小程序的生命周期函数、声明全局变量。</p>
+<p><code>app.wxss</code></p>
+<h4 id="3-你是怎么封装微信小程序的数据请求的-">3、你是怎么封装微信小程序的数据请求的？</h4>
+<p>答：</p>
+<ul>
+<li>一、将所有的接口放在统一的js文件中并导出</li>
+<li>二、在<code>app.js</code>中创建封装请求数据的方法</li>
+<li>三、在子页面中调用封装的方法请求数据</li>
+</ul>
+<h4 id="4-有哪些参数传值的方法-">4、有哪些参数传值的方法？</h4>
+<p>答：</p>
+<p>一、给<code>HTML</code>元素添加<code>data-*</code>属性来传递我们需要的值，然后通过<code>e.currentTarget.dataset</code>或<code>onload</code>的<code>param</code>参数获取。但<code>data-</code>名称不能有大写字母和不可以存放对象</p>
+<p>二、设置<code>id</code> 的方法标识来传值通过<code>e.currentTarget.id</code>获取设置的<code>id</code>的值,然后通过设置全局对象的方式来传递数值</p>
+<p>三、在<code>navigator</code>中添加参数传值</p>
+<h4 id="5-你使用过哪些方法-来提高微信小程序的应用速度-">5、你使用过哪些方法，来提高微信小程序的应用速度？</h4>
+<p>答：</p>
+<p>一、提高页面加载速度</p>
+<p>二、用户行为预测</p>
+<p>三、减少默认<code>data</code>的大小</p>
+<p>四、组件化方案</p>
+<h4 id="6-小程序与原生App哪个好-">6、小程序与原生App哪个好？</h4>
+<p>答： 小程序除了拥有公众号的低开发成本、低获客成本低以及无需下载等优势，在服务请求延时与用户使用体验是都得到了较大幅度 的提升，使得其能够承载跟复杂的服务功能以及使用户获得更好的用户体验。</p>
+<h4 id="7-简述微信小程序原理-">7、简述微信小程序原理？</h4>
+<p>答：微信小程序采用<code>JavaScript</code>、<code>WXML</code>、<code>WXSS</code>三种技术进行开发，从技术讲和现有的前端开发差不多，但深入挖掘的话却又有所不同。</p>
+<p><code>JavaScript</code>：首先JavaScript的代码是运行在微信App中的，并不是运行在浏览器中，因此一些H5技术的应用，需要微信App提供对应的API支持，而这限制住了H5技术的应用，且其不能称为严格的<code>H5</code>，可以称其为伪<code>H5</code>，同理，微信提供的独有的某些API，H5也不支持或支持的不是特别好。</p>
+<p><code>WXML</code>：WXML微信自己基于XML语法开发的，因此开发时，只能使用微信提供的现有标签，<code>HTML</code>的标签是无法使用的。</p>
+<p><code>WXSS</code>：WXSS具有CSS的大部分特性，但并不是所有的都支持，而且支持哪些，不支持哪些并没有详细的文档。</p>
+<p>微信的架构，是数据驱动的架构模式，它的UI和数据是分离的，所有的页面更新，都需要通过对数据的更改来实现。</p>
+<p>小程序分为两个部分<code>webview</code>和<code>appService</code>。其中<code>webview</code>主要用来展现<code>UI</code>，<code>appService</code>有来处理业务逻辑、数据及接口调用。</p>
+<p>它们在两个进程中运行，通过系统层<code>JSBridge</code>实现通信，实现UI的渲染、事件的处理</p>
+<h4 id="8-分析下微信小程序的优劣势-">8、分析下微信小程序的优劣势？</h4>
+<h4 id="答-">答：</h4>
+<h4 id="优势-">优势：</h4>
+<ol>
+<li>无需下载，通过搜索和扫一扫就可以打开。</li>
+<li>良好的用户体验：打开速度快。</li>
+<li>开发成本要比App要低。</li>
+<li>安卓上可以添加到桌面，与原生App差不多。</li>
+<li>为用户提供良好的安全保障。小程序的发布，微信拥有一套严格的审查流程， 不能通过审查的小程序是无法发布到线上的。</li>
+</ol>
+<h4 id="劣势-">劣势：</h4>
+<ol>
+<li>限制较多。页面大小不能超过1M。不能打开超过5个层级的页面。</li>
+<li>样式单一。小程序的部分组件已经是成型的了，样式不可以修改。例如：幻灯片、导航。</li>
+<li>推广面窄，不能分享朋友圈，只能通过分享给朋友，附近小程序推广。其中附近小程序也受到微信的限制。</li>
+<li>依托于微信，无法开发后台管理功能。</li>
+</ol>
+<h4 id="9-微信小程序与H5的区别-">9、微信小程序与H5的区别？</h4>
+<h3 id="答--">答：</h3>
+<h4 id="第一条是运行环境的不同">第一条是运行环境的不同</h4>
+<p>传统的HTML5的运行环境是浏览器，包括webview，而微信小程序的运行环境并非完整的浏览器，是微信开发团队基于浏览器内核完全重构的一个内置解析器，针对小程序专门做了优化，配合自己定义的开发语言标准，提升了小程序的性能。</p>
+<h4 id="第二条是开发成本的不同">第二条是开发成本的不同</h4>
+<p>只在微信中运行，所以不用再去顾虑浏览器兼容性，不用担心生产环境中出现不可预料的奇妙BUG</p>
+<h4 id="第三条是获取系统级权限的不同">第三条是获取系统级权限的不同</h4>
+<p>系统级权限都可以和微信小程序无缝衔接</p>
+<h4 id="第四条便是应用在生产环境的运行流畅度">第四条便是应用在生产环境的运行流畅度</h4>
+<p>长久以来，当HTML5应用面对复杂的业务逻辑或者丰富的页面交互时，它的体验总是不尽人意，需要不断的对项目优化来提升用户体验。但是由于微信小程序运行环境独立</p>
+<h4 id="10-怎么解决小程序的异步请求问题-">10、怎么解决小程序的异步请求问题？</h4>
+<h4 id="答---">答：</h4>
+<p>在回调函数中调用下一个组件的函数：</p>
+<h4 id="app-js">app.js</h4>
+<p><a href="https://camo.githubusercontent.com/9053f9229e45a2badf5df9268442e4066aa83ac21af79affaf0db2829c99eed2/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323031303233313832335f313630333434383631393435312e706e67"><img src="https://camo.githubusercontent.com/9053f9229e45a2badf5df9268442e4066aa83ac21af79affaf0db2829c99eed2/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323031303233313832335f313630333434383631393435312e706e67" alt="" /></a></p>
+<h4 id="index-js">index.js</h4>
+<p><a href="https://camo.githubusercontent.com/682f69c9cd127970cf11f7b04e4c8a009600907be34eee78c1788d0197eca9c5/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323031303233313832335f313630333434383538333435342e504e47"><img src="https://camo.githubusercontent.com/682f69c9cd127970cf11f7b04e4c8a009600907be34eee78c1788d0197eca9c5/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323031303233313832335f313630333434383538333435342e504e47" alt="" /></a></p>
+<h4 id="11-小程序的双向绑定和vue哪里不一样-">11、小程序的双向绑定和vue哪里不一样？</h4>
+<h3 id="答----">答：</h3>
+<p>小程序直接<code>this.data</code>的属性是不可以同步到视图的，必须调用：</p>
+<p><a href="https://camo.githubusercontent.com/e8bf2f6f16aab4fca40dd730d227bb2ab6caf2a3caa02a6192f00e777c8f783f/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323031303233313832345f313630333434383636303335302e706e67"><img src="https://camo.githubusercontent.com/e8bf2f6f16aab4fca40dd730d227bb2ab6caf2a3caa02a6192f00e777c8f783f/68747470733a2f2f79616e6779756e686169696d616765736f73732e6f73732d636e2d7368616e676861692e616c6979756e63732e636f6d2f323031303233313832345f313630333434383636303335302e706e67" alt="" /></a></p>
+<h4 id="12-哪些方法可以用来提高微信小程序的应用速度">12、哪些方法可以用来提高微信小程序的应用速度</h4>
+<ol>
+<li>提高页面加载速度</li>
+<li>用户行为预测</li>
+<li>减少默认 <code>data</code> 的大小</li>
+<li>组件化方案</li>
+</ol>
+<h4 id="13-如何实现下拉刷新">13、如何实现下拉刷新</h4>
+<p>首先在全局 <code>config</code> 中的 window 配置 <code>enablePullDownRefresh</code></p>
+<p>在 <code>Page</code> 中定义 <code>onPullDownRefresh</code> 钩子函数,到达下拉刷新条件后，该钩子函数执行，发起请求方法 请求返回后，调用 <code>wx.stopPullDownRefresh</code> 停止下拉刷新</p>
+<h4 id="14--和的区别是什么">14. <code>bindtap</code>和<code>catchtap</code>的区别是什么</h4>
+<h4 id="相同点---">相同点：</h4>
+<p>首先他们都是作为点击事件函数，就是点击时触发。在这个作用上他们是一样的，可以不做区分</p>
+<h4 id="不同点----">不同点：</h4>
+<p>他们的不同点主要是bindtap是不会阻止冒泡事件的，catchtap是阻值冒泡的</p>
+<h4 id="15--简述下--------的区别">15. 简述下 <code>wx.navigateTo()</code>, <code>wx.redirectTo()</code>,<code>wx.switchTab()</code>, <code>wx.navigateBack()</code>, <code>wx.reLaunch()</code>的区别</h4>
+<h4 id="wx-navigateTo---">wx.navigateTo()：</h4>
+<p>保留当前页面，跳转到应用内的某个页面。但是不能跳到 tabbar 页面</p>
+<h4 id="wx-redirectTo---">wx.redirectTo()：</h4>
+<p>关闭当前页面，跳转到应用内的某个页面。但是不允许跳转到 tabbar 页面</p>
+<h4 id="wx-switchTab---">wx.switchTab()：</h4>
+<p>跳转到 abBar 页面，并关闭其他所有非 tabBar 页面</p>
+<h4 id="wx-navigateBack--">wx.navigateBack()</h4>
+<p>关闭当前页面，返回上一页面或多级页面。可通过 getCurrentPages() 获取当前的页面栈，决定需要返回几层</p>
+<h4 id="wx-reLaunch---">wx.reLaunch()：</h4>
+<p>关闭所有页面，打开到应用内的某个页面</p>
+</div>
+<script>
+    const previewElement = document.getElementById('preview')
+    Vditor.setContentTheme('light', 'https://cdn.jsdelivr.net/npm/vditor@3.6.0/dist/css/content-theme');
+    Vditor.codeRender(previewElement, 'zh_CN');
+    Vditor.highlightRender({"enable":true,"lineNumber":false,"style":"github"}, previewElement, 'https://cdn.jsdelivr.net/npm/vditor@3.6.0');
+    Vditor.mathRender(previewElement, {
+        cdn: 'https://cdn.jsdelivr.net/npm/vditor@3.6.0',
+        math: {"engine":"KaTeX","inlineDigit":false,"macros":{}},
+    });
+    Vditor.mermaidRender(previewElement, 'https://cdn.jsdelivr.net/npm/vditor@3.6.0');
+    Vditor.flowchartRender(previewElement, 'https://cdn.jsdelivr.net/npm/vditor@3.6.0');
+    Vditor.graphvizRender(previewElement, 'https://cdn.jsdelivr.net/npm/vditor@3.6.0');
+    Vditor.chartRender(previewElement, 'https://cdn.jsdelivr.net/npm/vditor@3.6.0');
+    Vditor.mindmapRender(previewElement, 'https://cdn.jsdelivr.net/npm/vditor@3.6.0');
+    Vditor.abcRender(previewElement, 'https://cdn.jsdelivr.net/npm/vditor@3.6.0');
+    Vditor.mediaRender(previewElement);
+</script></body></html>
